@@ -25,43 +25,44 @@ float2 W(int k, int N) {
     return float2(cospi(x), -sinpi(x));
 }
 
+float2 complexMul(float2 x, float2 y) {
+    return float2(x[0] * y[0] - x[1] * y[1],
+                  x[0] * y[1] + x[1] * y[0]);
+}
+
 struct ParamBuff {
     int order [[ id(0) ]];
+    int step [[ id(1) ]];
+    int samplesNum [[ id(2) ]];
 };
 
-kernel void fft(constant ParamBuff &parameters [[ buffer(0) ]],
-                device const float* inputBuffer [[ buffer(1) ]],
-                device float* resultBuffer [[ buffer(2) ]],
-                device float2* stepBuffer [[ buffer(3) ]],
-                uint i [[ thread_position_in_grid ]],
-                uint samplesNum [[ grid_size ]]) {
+kernel void fftStep(constant ParamBuff &parameters [[ buffer(0) ]],
+                device const float2* inputBuffer [[ buffer(1) ]],
+                device float2* resultBuffer [[ buffer(2) ]],
+                uint i [[ thread_position_in_grid ]]) {
+
     auto order = parameters.order;
+    auto step = parameters.step;
+    auto samplesNum = parameters.samplesNum;
 
-    // reverse_bits for metal 2.1
-    auto indexInversed = biranyInversed(i, order);
-    auto inputSample = inputBuffer[indexInversed];
-    stepBuffer[i] = float2(inputSample, 0);
+    auto mask = ((0x1 << step) - 1) * ((i >> step) & 0x1);
+    auto wi = (i & mask) << (order - step - 1);
+    auto wCoeff = W(wi, samplesNum);
 
-//    var intermediateResultsBuf = [Complex].init(repeating: .zero, count: samplesNum)
+    auto sample = complexMul(inputBuffer[i], wCoeff);
+    resultBuffer[i] = sample;
 
-    for (int step = 0; step < order; step++) {
-        auto mask = ((0x1 << step) - 1) * ((i >> step) & 0x1);
-        auto wi = (i & mask) << (order - step - 1);
-        auto wCoeff = W(wi, samplesNum);;
-        stepBuffer[i] = stepBuffer[i] * wCoeff;
+    threadgroup_barrier(mem_flags::mem_none);
 
-//         thread group barrier
-
-        auto srcIdx = i & ~(0x1 << step);
-        auto halfSum = stepBuffer[srcIdx];
-//         barrier
-
-        srcIdx = i | (0x1 << step);
-        auto multiplier = ((i & (0x1 << step)) == 0) ? 1 : -1;
-        auto anotherHalfSum = multiplier * stepBuffer[srcIdx];
-        stepBuffer[i] = halfSum + anotherHalfSum;
+    auto idx = int(i) + (0x1 << step);
+    if ((i & ~(0x1 << step)) == 0 && idx < samplesNum) {
+        resultBuffer[idx] += sample;
     }
 
-    auto resultComplex = stepBuffer[i];
-    resultBuffer[i] = sqrt(resultComplex[0] * resultComplex[0] + resultComplex[1] * resultComplex[1]);
+    threadgroup_barrier(mem_flags::mem_none);
+
+    idx = int(i) - (0x1 << step);
+    if ((i & ~(0x1 << step)) != 0 && idx >= 0) {
+        resultBuffer[idx] -= sample;
+    }
 }
