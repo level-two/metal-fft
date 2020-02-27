@@ -27,22 +27,12 @@ class ViewController: NSViewController {
             let commandBuffer = commandQueue.makeCommandBuffer()
             else { fatalError() }
 
-        func makeArgumentBuffer(step: Int) -> MTLBuffer? {
-            let argEncoder = fftFunction.makeArgumentEncoder(bufferIndex: 0)
-            let argBuffer = device.makeBuffer(length: argEncoder.encodedLength, options: [])
-            argEncoder.setArgumentBuffer(argBuffer, offset: 0)
-            argEncoder.constantData(at: 0).assumingMemoryBound(to: Int.self).pointee = order
-            argEncoder.constantData(at: 1).assumingMemoryBound(to: Int.self).pointee = step
-            argEncoder.constantData(at: 2).assumingMemoryBound(to: Int.self).pointee = samplesNum
-            return argBuffer
-        }
-
-        let bufferSize = samplesNum * MemoryLayout<Float>.size * 2
+        let bufferSize = samplesNum * MemoryLayout<Float32>.size * 2
         guard let buffer1 = device.makeBuffer(length: bufferSize, options: .storageModeShared),
             let buffer2 = device.makeBuffer(length: bufferSize, options: .storageModeShared)
             else { fatalError() }
 
-        let inputContent = buffer1.contents().assumingMemoryBound(to: Float.self)
+        let inputContent = buffer1.contents().assumingMemoryBound(to: Float32.self)
         for i in 0 ..< samplesNum {
             let idx = i.binaryInversed(numberOfDigits: order)
             inputContent[idx << 1] = sin(2 * .pi * Float(i) * toneFreq / sampleRate)
@@ -54,12 +44,23 @@ class ViewController: NSViewController {
         let gridSize = MTLSizeMake(samplesNum, 1, 1)
         let threadGroupSize = MTLSizeMake(min(pipelineState.maxTotalThreadsPerThreadgroup, samplesNum), 1, 1)
         let buf = [buffer1, buffer2]
-        for step in 0..<order {
-            guard let argumentBuffer = makeArgumentBuffer(step: step) else { fatalError() }
+
+        let stepsNum = order
+
+        for step in 0..<stepsNum {
+            let argEncoder = fftFunction.makeArgumentEncoder(bufferIndex: 0)
+
+            guard let argBuffer = device.makeBuffer(length: argEncoder.encodedLength, options: []) else { fatalError() }
+
+            argEncoder.setArgumentBuffer(argBuffer, offset: 0)
+            argEncoder.constantData(at: 0).assumingMemoryBound(to: Int32.self).pointee = Int32(order)
+            argEncoder.constantData(at: 1).assumingMemoryBound(to: Int32.self).pointee = Int32(step)
+            argEncoder.constantData(at: 2).assumingMemoryBound(to: Int32.self).pointee = Int32(samplesNum)
+
             guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { fatalError() }
 
             computeEncoder.setComputePipelineState(pipelineState)
-            computeEncoder.setBuffer(argumentBuffer, offset: 0, index: 0)
+            computeEncoder.setBuffer(argBuffer, offset: 0, index: 0)
             computeEncoder.setBuffer(buf[step % 2], offset: 0, index: 1)
             computeEncoder.setBuffer(buf[(step+1) % 2], offset: 0, index: 2)
             computeEncoder.dispatchThreads(gridSize, threadsPerThreadgroup: threadGroupSize)
@@ -73,10 +74,9 @@ class ViewController: NSViewController {
 
         print("🔥🔥🔥")
 
-        let resultContent = buf[order % 2].contents().assumingMemoryBound(to: Float.self)
-//        var resultArray = [Float](repeating: 0, count: samplesNum)
+        let resultContent = buf[stepsNum % 2].contents().assumingMemoryBound(to: Float32.self)
         for i in 0..<samplesNum {
-//            resultArray[i] = resultContent[i*2]
+//            print("\(resultContent[i*2]), \(resultContent[i*2+1])")
             print("\(i) \(sqrt(resultContent[i*2]*resultContent[i*2] + resultContent[i*2+1]*resultContent[i*2+1]))")
         }
 

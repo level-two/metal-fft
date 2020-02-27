@@ -31,38 +31,40 @@ float2 complexMul(float2 x, float2 y) {
 }
 
 struct ParamBuff {
-    int order [[ id(0) ]];
-    int step [[ id(1) ]];
-    int samplesNum [[ id(2) ]];
+    int order [[id(0)]];
+    int step [[id(1)]];
+    int samplesNum [[id(2)]];
 };
 
-kernel void fftStep(constant ParamBuff &parameters [[ buffer(0) ]],
-                device const float2* inputBuffer [[ buffer(1) ]],
-                device float2* resultBuffer [[ buffer(2) ]],
-                uint i [[ thread_position_in_grid ]]) {
+kernel void fftStep(constant ParamBuff &parameters [[buffer(0)]],
+                device const float2* inputBuffer [[buffer(1)]],
+                device float2* resultBuffer [[buffer(2)]],
+                uint i [[thread_position_in_grid]]) {
 
     auto order = parameters.order;
     auto step = parameters.step;
     auto samplesNum = parameters.samplesNum;
 
-    auto mask = ((0x1 << step) - 1) * ((i >> step) & 0x1);
+    auto isEvenHalf = !((i >> step) & 0x1);
+
+    auto mask = isEvenHalf ? 0 : ((0x1 << step) - 1);
     auto wi = (i & mask) << (order - step - 1);
     auto wCoeff = W(wi, samplesNum);
 
     auto sample = complexMul(inputBuffer[i], wCoeff);
-    resultBuffer[i] = sample;
+    resultBuffer[i] = isEvenHalf ? sample : -sample;
 
     threadgroup_barrier(mem_flags::mem_none);
 
     auto idx = int(i) + (0x1 << step);
-    if ((i & ~(0x1 << step)) == 0 && idx < samplesNum) {
+    if (isEvenHalf) {
         resultBuffer[idx] += sample;
     }
 
     threadgroup_barrier(mem_flags::mem_none);
 
     idx = int(i) - (0x1 << step);
-    if ((i & ~(0x1 << step)) != 0 && idx >= 0) {
-        resultBuffer[idx] -= sample;
+    if (!isEvenHalf) {
+        resultBuffer[idx] += sample;
     }
 }
