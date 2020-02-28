@@ -7,20 +7,115 @@
 //
 
 import Cocoa
+import CoreFoundation
 import Metal
 
 class ViewController: NSViewController {
+    var device: MTLDevice?
+    var metalLayer: CAMetalLayer?
+    var defaultLibrary: MTLLibrary?
+
+//    MTLFunction
+//    MTLComputePipelineState
+//    MTLCommandQueue
+//    var timer: CADisplayLink?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupMetal()
+        setupMetalLayer()
+        setupRenderingPipeline()
+    }
 
+    func setupMetal() {
+        device = MTLCreateSystemDefaultDevice()
+        defaultLibrary = device?.makeDefaultLibrary()
+    }
+
+
+    func setupMetalLayer() {
+        metalLayer = {
+            let layer = CAMetalLayer()
+            layer.device = device
+            layer.pixelFormat = .bgra8Unorm
+            layer.framebufferOnly = false
+            layer.frame = view.layer?.frame ?? .zero
+            view.layer?.addSublayer(layer)
+            return layer
+        }()
+    }
+
+    func setupRenderingPipeline() {
+        // TODO: Convert fft output to vertices and render them
+
+        let vertexData: [Float] = [
+            0.0,  1.0, 0.0,
+            -1.0, -1.0, 0.0,
+            1.0, -1.0, 0.0
+        ]
+
+        let dataSize = vertexData.count * MemoryLayout.size(ofValue: vertexData[0])
+        let vertexBuffer = device?.makeBuffer(bytes: vertexData, length: dataSize, options: [])
+
+        let fragmentProgram = defaultLibrary?.makeFunction(name: "basic_fragment")
+        let vertexProgram = defaultLibrary?.makeFunction(name: "basic_vertex")
+
+        let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
+        pipelineStateDescriptor.vertexFunction = vertexProgram
+        pipelineStateDescriptor.fragmentFunction = fragmentProgram
+        pipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+
+        guard let device = device,
+            let pipelineState = try? device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
+            else { return }
+
+        guard let drawable = metalLayer?.nextDrawable() else { return }
+        let renderPassDescriptor = MTLRenderPassDescriptor()
+        renderPassDescriptor.colorAttachments[0].texture = drawable.texture
+        renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(
+            red: 0.0,
+            green: 104.0/255.0,
+            blue: 55.0/255.0,
+            alpha: 1.0)
+
+        guard let commandQueue = device.makeCommandQueue(),
+            let commandBuffer = commandQueue.makeCommandBuffer(),
+            let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
+            else { return }
+
+        renderEncoder.setRenderPipelineState(pipelineState)
+        renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3, instanceCount: 1)
+        renderEncoder.endEncoding()
+
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+
+    }
+
+//    func setupRenderingLoop() {
+//        timer = CADisplayLink(target: self, selector: #selector(renderingLoop))
+//        timer?.add(to: RunLoop.main, forMode: .default)
+//    }
+
+//    @objc func renderingLoop() {
+//        autoreleasepool {
+//            self.render()
+//        }
+//    }
+
+//    func render() {
+//    }
+
+    func sendMetalCommands() {
         let order = 12
         let samplesNum = 1 << order
         let sampleRate = Float(44100.0)
         let toneFreq = Float(1234.0)
 
-        guard let device = MTLCreateSystemDefaultDevice(),
-            let defaultLibrary = device.makeDefaultLibrary(),
+        guard let device = device,
+            let defaultLibrary = defaultLibrary,
             let fftFunction = defaultLibrary.makeFunction(name: "fftStep"),
             let pipelineState = try? device.makeComputePipelineState(function: fftFunction),
             let commandQueue = device.makeCommandQueue(),
@@ -79,8 +174,6 @@ class ViewController: NSViewController {
 //            print("\(resultContent[i*2]), \(resultContent[i*2+1])")
             print("\(i) \(sqrt(resultContent[i*2]*resultContent[i*2] + resultContent[i*2+1]*resultContent[i*2+1]))")
         }
-
-        exit(0)
     }
 
 }
