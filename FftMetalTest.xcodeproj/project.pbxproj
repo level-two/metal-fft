@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9E3048F8240A8DE000399FC8 /* shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3048F7240A8DE000399FC8 /* shaders.metal */; };
 		9E316B75240926D0008CE400 /* rendering.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E316B74240926D0008CE400 /* rendering.metal */; };
 		9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */; };
 		9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE92400265700FEFFE3 /* ViewController.swift */; };
@@ -16,6 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9E3048F7240A8DE000399FC8 /* shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = shaders.metal; sourceTree = "<group>"; };
+		9E3048F9240A8EFD00399FC8 /* AAPLShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AAPLShaderTypes.h; sourceTree = "<group>"; };
 		9E316B74240926D0008CE400 /* rendering.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = rendering.metal; sourceTree = "<group>"; };
 		9EFD9FE42400265700FEFFE3 /* FftMetalTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FftMetalTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -61,6 +64,8 @@
 				9EFD9FE92400265700FEFFE3 /* ViewController.swift */,
 				9EFD9FF72400267C00FEFFE3 /* fft.metal */,
 				9E316B74240926D0008CE400 /* rendering.metal */,
+				9E3048F7240A8DE000399FC8 /* shaders.metal */,
+				9E3048F9240A8EFD00399FC8 /* AAPLShaderTypes.h */,
 				9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */,
 				9EFD9FED2400265A00FEFFE3 /* Main.storyboard */,
 				9EFD9FF02400265A00FEFFE3 /* Info.plist */,
@@ -140,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EFD9FF82400267C00FEFFE3 /* fft.metal in Sources */,
+				9E3048F8240A8DE000399FC8 /* shaders.metal in Sources */,
 				9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */,
 				9E316B75240926D0008CE400 /* rendering.metal in Sources */,
 				9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */,
