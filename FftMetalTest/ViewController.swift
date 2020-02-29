@@ -9,6 +9,7 @@
 import Cocoa
 import CoreFoundation
 import Metal
+import MetalKit
 
 struct AAPLVertex {
     var position: (Float32, Float32)
@@ -19,8 +20,8 @@ struct AAPLVertex {
 
 class ViewController: NSViewController {
     var device: MTLDevice?
-    var metalLayer: CAMetalLayer?
     var defaultLibrary: MTLLibrary?
+    var metalView: MTKView?
 
 //    MTLFunction
 //    MTLComputePipelineState
@@ -30,7 +31,7 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupMetal()
-        setupMetalLayer()
+        setupMetalView()
         setupRenderingPipeline()
     }
 
@@ -40,25 +41,22 @@ class ViewController: NSViewController {
     }
 
 
-    func setupMetalLayer() {
-        metalLayer = {
-            let layer = CAMetalLayer()
-            layer.device = device
-            layer.pixelFormat = .bgra8Unorm
-            layer.framebufferOnly = false
-            layer.frame = view.layer?.frame ?? .zero
-            view.layer?.addSublayer(layer)
-            return layer
+    func setupMetalView() {
+        metalView = {
+            let metalView = MTKView(frame: self.view.frame, device: device)
+            metalView.framebufferOnly = false
+            view.addSubview(metalView)
+            return metalView
         }()
     }
 
     func setupRenderingPipeline() {
         guard let frame = view.layer?.frame else { return }
 
-        var viewportSize = MTLSize(width: Int(frame.width), height: Int(frame.height), depth: 0)
+        var viewportSize = MTLSize(width: Int(frame.width), height: Int(frame.height), depth: 1)
 
-        let fftResults = sendMetalCommands()
-        let texture = fftTexture(from: fftResults, samplesNum: 4096, size: viewportSize)
+        let fftData = claculateFft()
+        let texture = fftTexture(from: fftData, samplesNum: 4096, size: viewportSize)
 
         let vertexData: [Float32] = [
              Float32(frame.width), -Float32(frame.height), 1, 1,
@@ -84,15 +82,7 @@ class ViewController: NSViewController {
             let pipelineState = try? device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)
             else { return }
 
-        guard let drawable = metalLayer?.nextDrawable() else { return }
-        let renderPassDescriptor = MTLRenderPassDescriptor()
-        renderPassDescriptor.colorAttachments[0].texture = drawable.texture
-        renderPassDescriptor.colorAttachments[0].loadAction = .clear
-        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(
-            red: 0.0,
-            green: 104.0/255.0,
-            blue: 55.0/255.0,
-            alpha: 1.0)
+        guard let renderPassDescriptor = metalView?.currentRenderPassDescriptor else { return }
 
         guard let commandQueue = device.makeCommandQueue(),
             let commandBuffer = commandQueue.makeCommandBuffer(),
@@ -120,7 +110,9 @@ class ViewController: NSViewController {
         //        [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:_numVertices];
         renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: vertexData.count/4, instanceCount: 1)
 
+        renderEncoder.endEncoding()
 
+        guard let drawable = metalView?.currentDrawable else { return }
         commandBuffer.present(drawable)
         commandBuffer.commit()
 
@@ -287,7 +279,7 @@ class ViewController: NSViewController {
 //    func render() {
 //    }
 
-    func sendMetalCommands() -> MTLBuffer {
+    func claculateFft() -> [Float32] {
         let order = 12
         let samplesNum = 1 << order
         let sampleRate = Float(44100.0)
@@ -345,33 +337,32 @@ class ViewController: NSViewController {
 
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
-        return buf[stepsNum % 2]
+
         print("🔥🔥🔥")
-//
-//        let resultContent = buf[stepsNum % 2].contents().assumingMemoryBound(to: Float32.self)
-//        for i in 0..<samplesNum {
-////            print("\(resultContent[i*2]), \(resultContent[i*2+1])")
-//            print("\(i) \(sqrt(resultContent[i*2]*resultContent[i*2] + resultContent[i*2+1]*resultContent[i*2+1]))")
-//        }
+
+        let resultContent = buf[stepsNum % 2].contents().assumingMemoryBound(to: Float32.self)
+        var resultData = [Float32].init(repeating: 0, count: samplesNum)
+        for i in 0..<samplesNum {
+            resultData[i] = sqrt(resultContent[i*2]*resultContent[i*2] + resultContent[i*2+1]*resultContent[i*2+1])
+        }
+        return resultData
     }
 
 
 
-    func fftTexture(from buffer: MTLBuffer, samplesNum: Int, size: MTLSize) -> MTLTexture? {
+    func fftTexture(from fftData: [Float32], samplesNum: Int, size: MTLSize) -> MTLTexture? {
         let bytesPerPixel = 4
 
         var data = Data(repeating: 255, count: bytesPerPixel * size.width * size.height)
 
-        let content = buffer.contents().assumingMemoryBound(to: Float32.self)
-
         var maxVal = Float32(0)
-        for i in 0..<samplesNum/2 where content[i] > maxVal {
-            maxVal = content[i]
+        for i in 0..<samplesNum/2 where fftData[i] > maxVal {
+            maxVal = fftData[i]
         }
 
         for i in 0..<samplesNum/2 {
             let x = (i * size.width) / (samplesNum/2)
-            let y = content[i] * Float32(size.height) / maxVal
+            let y = fftData[i] * Float32(size.height-1) / maxVal
             let startBytePos = (Int(y) * size.width + x) * bytesPerPixel
             data.replaceSubrange(startBytePos ..< startBytePos + bytesPerPixel,
                                  with: [UInt8].init(repeating: 0, count: bytesPerPixel))
