@@ -9,10 +9,11 @@
 import Foundation
 
 protocol SpectrumAnalyzerViewModel {
+    func getInteractor() -> SpectrumAnalyzerInteractor
+
     var samples: [Double] { get }
-    var order: Int { get set }
     var delegate: SpectrumAnalyzerViewModelDelegate? { get set }
 
     func viewVisibilityChanged(isVisible: Bool)
-    func getInteractor() -> SpectrumAnalyzerInteractor
+    func setOrder(_ order: Int)
 }
