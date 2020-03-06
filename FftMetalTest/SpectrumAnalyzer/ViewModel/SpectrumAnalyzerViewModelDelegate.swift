@@ -9,5 +9,5 @@
 import Foundation
 
 protocol SpectrumAnalyzerViewModelDelegate: class {
-    func draw(spectrumData: [Double])
+    func redraw()
 }

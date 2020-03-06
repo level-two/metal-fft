@@ -7,16 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9E3551ED2410E8D100151738 /* SpectrumAnalyzerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551EC2410E8D100151738 /* SpectrumAnalyzerModel.swift */; };
+		9E3551ED2410E8D100151738 /* SpectrumAnalyzerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551EC2410E8D100151738 /* SpectrumAnalyzerInteractor.swift */; };
 		9E3551F12410E93100151738 /* SpectrumAnalyzerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551F02410E93100151738 /* SpectrumAnalyzerViewModel.swift */; };
 		9E3551F42410F04A00151738 /* SpectrumAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551F32410F04A00151738 /* SpectrumAnalyzerView.swift */; };
 		9E3551FC2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551FB2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift */; };
 		9E3552042410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3552032410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift */; };
-		9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultModel.swift */; };
-		9E35520F241103BB00151738 /* SamplingFourierCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35520D241103BB00151738 /* SamplingFourierCalculator.swift */; };
+		9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift */; };
+		9E35520F241103BB00151738 /* SamplingFourierCalculatorImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35520D241103BB00151738 /* SamplingFourierCalculatorImplementation.swift */; };
 		9E355210241103BB00151738 /* SamplingFourierCalculatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35520E241103BB00151738 /* SamplingFourierCalculatorDelegate.swift */; };
-		9E35521624110FAB00151738 /* SpectrumAnalyzerSamplesConsumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35521524110FAB00151738 /* SpectrumAnalyzerSamplesConsumer.swift */; };
 		9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */; };
+		9ECEC1392412734B004E3407 /* Pipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ECEC1382412734B004E3407 /* Pipe.swift */; };
+		9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */; };
 		9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */; };
 		9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE92400265700FEFFE3 /* ViewController.swift */; };
 		9EFD9FEC2400265A00FEFFE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */; };
@@ -25,16 +26,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9E3551EC2410E8D100151738 /* SpectrumAnalyzerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerModel.swift; sourceTree = "<group>"; };
+		9E3551EC2410E8D100151738 /* SpectrumAnalyzerInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerInteractor.swift; sourceTree = "<group>"; };
 		9E3551F02410E93100151738 /* SpectrumAnalyzerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerViewModel.swift; sourceTree = "<group>"; };
 		9E3551F32410F04A00151738 /* SpectrumAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerView.swift; sourceTree = "<group>"; };
 		9E3551FB2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerViewModelDelegate.swift; sourceTree = "<group>"; };
 		9E3552032410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerDefaultViewModel.swift; sourceTree = "<group>"; };
-		9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerDefaultModel.swift; sourceTree = "<group>"; };
-		9E35520D241103BB00151738 /* SamplingFourierCalculator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculator.swift; sourceTree = "<group>"; };
+		9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerDefaultInteractor.swift; sourceTree = "<group>"; };
+		9E35520D241103BB00151738 /* SamplingFourierCalculatorImplementation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculatorImplementation.swift; sourceTree = "<group>"; };
 		9E35520E241103BB00151738 /* SamplingFourierCalculatorDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculatorDelegate.swift; sourceTree = "<group>"; };
-		9E35521524110FAB00151738 /* SpectrumAnalyzerSamplesConsumer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerSamplesConsumer.swift; sourceTree = "<group>"; };
 		9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+binaryInversed.swift"; sourceTree = "<group>"; };
+		9ECEC1382412734B004E3407 /* Pipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pipe.swift; sourceTree = "<group>"; };
+		9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculator.swift; sourceTree = "<group>"; };
 		9EFD9FE42400265700FEFFE3 /* FftMetalTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FftMetalTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EFD9FE92400265700FEFFE3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -70,9 +72,8 @@
 		9E3551EF2410E92200151738 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9E3551EC2410E8D100151738 /* SpectrumAnalyzerModel.swift */,
-				9E35521524110FAB00151738 /* SpectrumAnalyzerSamplesConsumer.swift */,
-				9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultModel.swift */,
+				9E3551EC2410E8D100151738 /* SpectrumAnalyzerInteractor.swift */,
+				9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -98,8 +99,9 @@
 		9E35520C241103BB00151738 /* SamplingFourierCalculator */ = {
 			isa = PBXGroup;
 			children = (
-				9E35520D241103BB00151738 /* SamplingFourierCalculator.swift */,
+				9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */,
 				9E35520E241103BB00151738 /* SamplingFourierCalculatorDelegate.swift */,
+				9E35520D241103BB00151738 /* SamplingFourierCalculatorImplementation.swift */,
 				9EF644DD241154DD007D2E2E /* Metal */,
 				9EF644DC241154CE007D2E2E /* Extensions */,
 			);
@@ -143,6 +145,7 @@
 			children = (
 				9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */,
 				9EFD9FE92400265700FEFFE3 /* ViewController.swift */,
+				9ECEC1382412734B004E3407 /* Pipe.swift */,
 				9E3551EE2410E91800151738 /* SpectrumAnalyzer */,
 				9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */,
 				9EFD9FED2400265A00FEFFE3 /* Main.storyboard */,
@@ -222,17 +225,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E35521624110FAB00151738 /* SpectrumAnalyzerSamplesConsumer.swift in Sources */,
+				9ECEC1392412734B004E3407 /* Pipe.swift in Sources */,
+				9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */,
 				9EFD9FF82400267C00FEFFE3 /* fft.metal in Sources */,
 				9E3551F42410F04A00151738 /* SpectrumAnalyzerView.swift in Sources */,
 				9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */,
-				9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultModel.swift in Sources */,
+				9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift in Sources */,
 				9E3552042410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift in Sources */,
 				9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */,
 				9E355210241103BB00151738 /* SamplingFourierCalculatorDelegate.swift in Sources */,
 				9E3551F12410E93100151738 /* SpectrumAnalyzerViewModel.swift in Sources */,
-				9E3551ED2410E8D100151738 /* SpectrumAnalyzerModel.swift in Sources */,
-				9E35520F241103BB00151738 /* SamplingFourierCalculator.swift in Sources */,
+				9E3551ED2410E8D100151738 /* SpectrumAnalyzerInteractor.swift in Sources */,
+				9E35520F241103BB00151738 /* SamplingFourierCalculatorImplementation.swift in Sources */,
 				9E3551FC2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift in Sources */,
 				9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */,
 			);
