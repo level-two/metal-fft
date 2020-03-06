@@ -6,9 +6,7 @@
 //  Copyright © 2020 Yauheni Lychkouski. All rights reserved.
 //
 
-protocol SpectrumAnalyzerModel {
-    
-
-    func allocateResources(order: Int)
-    func deallocateResources()
+protocol SpectrumAnalyzerInteractor {
+    var isPlaying: Pipe<Bool> { get }
+    var samples: Pipe<[Double]> { get }
 }

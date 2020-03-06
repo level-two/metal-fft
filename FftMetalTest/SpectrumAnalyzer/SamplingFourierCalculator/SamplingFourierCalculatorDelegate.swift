@@ -7,5 +7,5 @@
 //
 
 protocol SamplingFourierCalculatorDelegate: class {
-    func onFourierCalculated(_ spectrumValues: [Double])
+    func onFourierCalculated(_ spectrumData: [Double])
 }

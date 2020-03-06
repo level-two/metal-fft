@@ -24,18 +24,18 @@ public class SpectrumAnalyzerView: NSView {
         commonInit()
     }
 
-    private var viewModel: SpectrumAnalyzerViewModel?
+    private let viewModel: SpectrumAnalyzerViewModel = SpectrumAnalyzerDefaultViewModel()
 }
 
 extension SpectrumAnalyzerView {
-    func set(viewModel: SpectrumAnalyzerViewModel) {
-        self.viewModel = viewModel
-        self.viewModel?.delegate = self
+    func getInteractor() -> SpectrumAnalyzerInteractor {
+        return viewModel.getInteractor()
     }
 }
 
 extension SpectrumAnalyzerView: SpectrumAnalyzerViewModelDelegate {
-    func draw(spectrumData: [Double]) {
+    func redraw() {
+        self.setNeedsDisplay(bounds)
     }
 }
 
@@ -76,25 +76,22 @@ extension SpectrumAnalyzerView {
 
         grid.stroke()
 
-
-        let numSamples = 2048
-        var mockSamples = [Double].init(repeating: 0, count: numSamples)
-
-        for i in 0..<numSamples {
-            mockSamples[i] = pow(10, Double.random(in: -150...10) / 20)
-        }
+        let samples = viewModel.samples
 
         let spectrum = NSBezierPath()
         NSColor(red: 158/255, green: 137/255, blue: 43/255, alpha: 1).setStroke()
 
-        for i in 0..<numSamples {
-            let x = xStep * log10( sampleFreq / 2 * CGFloat(i) / CGFloat(numSamples) )
-            let sampleVal = mockSamples[i]
+        for i in 0..<samples.count {
+            let x = (i == 0) ? 0 : xStep * log10( sampleFreq / 2 * CGFloat(i) / CGFloat(samples.count) )
+            let sampleVal = samples[i]
             let yLogVal = (sampleVal < 1e-5) ? -100 : 20 * log10(CGFloat(sampleVal))
             let y = (100 + yLogVal) / 10 * yStep
-            print(yLogVal)
-            spectrum.move(to: CGPoint(x: x, y: 0))
-            spectrum.line(to: CGPoint(x: x, y: y))
+
+            if i == 0 {
+                spectrum.move(to: CGPoint(x: x, y: y))
+            } else {
+                spectrum.line(to: CGPoint(x: x, y: y))
+            }
         }
 
         spectrum.stroke()
