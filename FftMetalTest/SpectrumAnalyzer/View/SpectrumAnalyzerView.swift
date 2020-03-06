@@ -24,6 +24,8 @@ public class SpectrumAnalyzerView: NSView {
         commonInit()
     }
 
+    private var token: NSKeyValueObservation?
+
     private let viewModel: SpectrumAnalyzerViewModel = SpectrumAnalyzerDefaultViewModel()
 }
 
@@ -41,10 +43,14 @@ extension SpectrumAnalyzerView: SpectrumAnalyzerViewModelDelegate {
 
 fileprivate extension SpectrumAnalyzerView {
     func commonInit() {
-        setupView()
-    }
+        viewModel.delegate = self
 
-    func setupView() {
+        token = observe(\.isHidden) { [weak self] _, change in
+            guard let isHidden = change.newValue else { return }
+            self?.viewModel.viewVisibilityChanged(isVisible: !isHidden)
+        }
+
+        viewModel.viewVisibilityChanged(isVisible: !isHidden)
     }
 }
 

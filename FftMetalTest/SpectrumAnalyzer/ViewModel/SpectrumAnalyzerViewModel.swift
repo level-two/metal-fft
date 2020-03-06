@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol SpectrumAnalyzerViewModel {
+protocol SpectrumAnalyzerViewModel: class {
     func getInteractor() -> SpectrumAnalyzerInteractor
 
     var samples: [Double] { get }
