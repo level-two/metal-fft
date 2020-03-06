@@ -9,61 +9,49 @@
 import Foundation
 
 class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
-    struct State {
-        var isVisible: Bool
-        var isPlaying: Bool
-
-        var isOnAir: Bool {
-            return isVisible && isPlaying
-        }
-
-        static var initial: State {
-            return State(isVisible: false, isPlaying: false)
-        }
-    }
-
     var samples: [Double]
     var delegate: SpectrumAnalyzerViewModelDelegate?
-    var order: Int {
-        didSet {
-            guard oldValue != order, state.isOnAir else { return }
-            deallocateFourierCalculator()
-            instantiateFourierCalculator(order: self.order)
-        }
-    }
 
     init() {
+        isVisible = false
+        isPlaying = false
         order = 12
+
         samples = []
-        state = .initial
 
         interactor = SpectrumAnalyzerDefaultInteractor()
 
         interactor.isPlaying.bind { [weak self] isPlaying in
-            self?.state.isPlaying = isPlaying
+            DispatchQueue.main.async { [weak self] in
+                self?.isPlaying = isPlaying
+            }
         }
-        
+
         interactor.samples.bind { [weak self] samples in
-            self?.samplingFourierCalculator?.pushSamples(samples)
+            DispatchQueue.main.async { [weak self] in
+                self?.samplingFourierCalculator?.pushSamples(samples)
+            }
         }
     }
 
     func viewVisibilityChanged(isVisible: Bool) {
-        state.isVisible = isVisible
+        assert(Thread.isMainThread)
+        self.isVisible = isVisible
+    }
+
+    func setOrder(_ order: Int) {
+        assert(Thread.isMainThread)
+        guard order > 8, order <= 14 else { return }
+        self.order = order
     }
 
     func getInteractor() -> SpectrumAnalyzerInteractor {
         return interactor
     }
 
-    private var state: State {
-        didSet {
-            guard state.isOnAir else { return }
-
-            deallocateFourierCalculator()
-            instantiateFourierCalculator(order: self.order)
-        }
-    }
+    private var isVisible: Bool { didSet { stateChanged() } }
+    private var isPlaying: Bool { didSet { stateChanged() } }
+    private var order: Int { didSet { stateChanged() } }
 
     private var samplingFourierCalculator: SamplingFourierCalculator?
     private let interactor: SpectrumAnalyzerInteractor
@@ -71,18 +59,22 @@ class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
 
 extension SpectrumAnalyzerDefaultViewModel: SamplingFourierCalculatorDelegate {
     func onFourierCalculated(_ spectrumData: [Double]) {
-        self.samples = spectrumData
-        delegate?.redraw()
+        DispatchQueue.main.async { [weak self] in
+            self?.samples = spectrumData
+            self?.delegate?.redraw()
+        }
     }
 }
 
 fileprivate extension SpectrumAnalyzerDefaultViewModel {
-    func instantiateFourierCalculator(order: Int) {
-        samplingFourierCalculator = SamplingFourierCalculatorImplementation(order: order)
-        samplingFourierCalculator?.delegate = self
-    }
+    func stateChanged() {
+        assert(Thread.isMainThread)
 
-    func deallocateFourierCalculator() {
         samplingFourierCalculator = nil
+
+        if isVisible, isPlaying {
+            samplingFourierCalculator = SamplingFourierCalculatorImplementation(order: order)
+            samplingFourierCalculator?.delegate = self
+        }
     }
 }
