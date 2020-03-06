@@ -10,24 +10,11 @@ import Cocoa
 import CoreFoundation
 
 class ViewController: NSViewController {
-    var spectrumAnalyzer: SpectrumAnalyzer?
+//    var spectrumAnalyzer: SpectrumAnalyzer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let order = 12
-        let samplesNum = 1 << order
-
-        spectrumAnalyzer = SpectrumAnalyzer(order: order, samplesNum: samplesNum)
-        spectrumAnalyzer?.onCalculationCompleted = { data in
-            print(data)
-        }
-
-        let sampleRate = 44100.0
-        let toneFreq = 1234.0
-
-        for i in 0 ..< samplesNum {
-            let sample = sin(2 * .pi * Double(i) * toneFreq / sampleRate)
-            spectrumAnalyzer?.addSample(sample)
-        }
+        let analyzerView = SpectrumAnalyzerView(frame: view.bounds)
+        view.addSubview(analyzerView)
     }
 }
