@@ -18,6 +18,7 @@
 		9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */; };
 		9ECEC1392412734B004E3407 /* Pipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ECEC1382412734B004E3407 /* Pipe.swift */; };
 		9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */; };
+		9EE77D7A2412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE77D792412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift */; };
 		9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */; };
 		9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE92400265700FEFFE3 /* ViewController.swift */; };
 		9EFD9FEC2400265A00FEFFE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */; };
@@ -37,6 +38,7 @@
 		9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+binaryInversed.swift"; sourceTree = "<group>"; };
 		9ECEC1382412734B004E3407 /* Pipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pipe.swift; sourceTree = "<group>"; };
 		9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculator.swift; sourceTree = "<group>"; };
+		9EE77D792412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSView+bindFrameToSuperviewBounds.swift"; sourceTree = "<group>"; };
 		9EFD9FE42400265700FEFFE3 /* FftMetalTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FftMetalTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EFD9FE92400265700FEFFE3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */,
 				9EFD9FE92400265700FEFFE3 /* ViewController.swift */,
 				9ECEC1382412734B004E3407 /* Pipe.swift */,
+				9EE77D792412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift */,
 				9E3551EE2410E91800151738 /* SpectrumAnalyzer */,
 				9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */,
 				9EFD9FED2400265A00FEFFE3 /* Main.storyboard */,
@@ -230,6 +233,7 @@
 				9EFD9FF82400267C00FEFFE3 /* fft.metal in Sources */,
 				9E3551F42410F04A00151738 /* SpectrumAnalyzerView.swift in Sources */,
 				9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */,
+				9EE77D7A2412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift in Sources */,
 				9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift in Sources */,
 				9E3552042410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift in Sources */,
 				9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */,
