@@ -8,6 +8,6 @@
 
 protocol SamplingFourierCalculator {
     init?(order: Int)
-    func pushSamples(_ samples: [Double])
-    var delegate: SamplingFourierCalculatorDelegate? { get set }
+    var inputSamples: Pipe<[Double]> { get }
+    var outputSpectrum: Pipe<[Double]> { get }
 }

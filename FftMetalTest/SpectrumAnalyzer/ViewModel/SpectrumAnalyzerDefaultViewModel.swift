@@ -21,16 +21,8 @@ class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
 
         interactor = SpectrumAnalyzerDefaultInteractor()
 
-        interactor.isPlaying.bind { [weak self] isPlaying in
-            DispatchQueue.main.async { [weak self] in
-                self?.isPlaying = isPlaying
-            }
-        }
-
-        interactor.samples.bind { [weak self] samples in
-            DispatchQueue.main.async { [weak self] in
-                self?.samplingFourierCalculator?.pushSamples(samples)
-            }
+        interactor.isPlaying.bindOnMain { [weak self] isPlaying in
+            self?.isPlaying = isPlaying
         }
     }
 
@@ -57,15 +49,6 @@ class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
     private let interactor: SpectrumAnalyzerInteractor
 }
 
-extension SpectrumAnalyzerDefaultViewModel: SamplingFourierCalculatorDelegate {
-    func onFourierCalculated(_ spectrumData: [Double]) {
-        DispatchQueue.main.async { [weak self] in
-            self?.samples = spectrumData
-            self?.delegate?.redraw()
-        }
-    }
-}
-
 fileprivate extension SpectrumAnalyzerDefaultViewModel {
     func stateChanged() {
         assert(Thread.isMainThread)
@@ -74,7 +57,11 @@ fileprivate extension SpectrumAnalyzerDefaultViewModel {
 
         if isVisible, isPlaying {
             samplingFourierCalculator = SamplingFourierCalculatorImplementation(order: order)
-            samplingFourierCalculator?.delegate = self
+            interactor.samples.bindOnMain(to: samplingFourierCalculator?.inputSamples)
+            samplingFourierCalculator?.outputSpectrum.bindOnMain { [weak self] spectrumData in
+                self?.samples = spectrumData
+                self?.delegate?.redraw()
+            }
         }
     }
 }

@@ -10,16 +10,6 @@
 #include <metal_compute>
 using namespace metal;
 
-int biranyInversed(int value, int numberOfDigits) {
-    int result = 0;
-    for(int i = 0; i < numberOfDigits; i++) {
-        result = result << 1;
-        result = result | (value & 0x1);
-        value = value >> 1;
-    }
-    return result;
-}
-
 float2 W(int k, int N) {
     auto x = 2 * float(k) / float(N);
     return float2(cospi(x), -sinpi(x));
@@ -28,6 +18,10 @@ float2 W(int k, int N) {
 float2 complexMul(float2 x, float2 y) {
     return float2(x[0] * y[0] - x[1] * y[1],
                   x[0] * y[1] + x[1] * y[0]);
+}
+
+float complexModulus(float2 x) {
+    return sqrt(x[0] * x[0] + x[1] * x[1]);
 }
 
 struct ParamBuff {
@@ -68,3 +62,11 @@ kernel void fftStep(constant ParamBuff &parameters [[buffer(0)]],
         resultBuffer[idx] += sample;
     }
 }
+
+kernel void modulus(device const float2* inputBuffer [[buffer(0)]],
+                    device float* resultBuffer [[buffer(1)]],
+                    uint i [[thread_position_in_grid]]) {
+
+    resultBuffer[i] = complexModulus(inputBuffer[i]);
+}
+
