@@ -9,7 +9,8 @@
 import Metal
 
 final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
-    weak var delegate: SamplingFourierCalculatorDelegate?
+    let inputSamples = Pipe<[Double]>()
+    let outputSpectrum = Pipe<[Double]>()
 
     init?(order: Int) {
         self.order = order
@@ -20,14 +21,18 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
             let device = MTLCreateSystemDefaultDevice(),
             let defaultLibrary = device.makeDefaultLibrary(),
             let fftFunction = defaultLibrary.makeFunction(name: "fftStep"),
-            let pipelineState = try? device.makeComputePipelineState(function: fftFunction),
+            let fftPipelineState = try? device.makeComputePipelineState(function: fftFunction),
+            let modulusFunction = defaultLibrary.makeFunction(name: "modulus"),
+            let modulusPipelineState = try? device.makeComputePipelineState(function: modulusFunction),
             let commandQueue = device.makeCommandQueue()
             else { return nil }
 
         self.device = device
         self.defaultLibrary = defaultLibrary
         self.fftFunction = fftFunction
-        self.pipelineState = pipelineState
+        self.fftPipelineState = fftPipelineState
+        self.modulusFunction = modulusFunction
+        self.modulusPipelineState = modulusPipelineState
         self.commandQueue = commandQueue
 
         let bufferSize = samplesNum * MemoryLayout<Float32>.size * 2
@@ -41,18 +46,8 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
         self.sharedBuffer = sharedBuffer
         self.privateBuffer1 = privateBuffer1
         self.privateBuffer2 = privateBuffer2
-    }
 
-    func pushSamples(_ samples: [Double]) {
-        for idx in 0..<samples.count {
-            let inversedSampleIndex = sampleIndex.binaryInversed(numberOfDigits: order)
-            reorderedSamples[inversedSampleIndex] = Float32(samples[idx])
-            sampleIndex += 1
-            if sampleIndex == reorderedSamples.count {
-                sampleIndex = 0
-                claculateFourier()
-            }
-        }
+        setupBindings()
     }
 
     private let samplesNum: Int
@@ -61,7 +56,9 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
     private let device: MTLDevice
     private let defaultLibrary: MTLLibrary
     private let fftFunction: MTLFunction
-    private let pipelineState: MTLComputePipelineState
+    private let fftPipelineState: MTLComputePipelineState
+    private let modulusFunction: MTLFunction
+    private let modulusPipelineState: MTLComputePipelineState
     private let commandQueue: MTLCommandQueue
 
     private let sharedBuffer: MTLBuffer
@@ -72,9 +69,25 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
     private var sampleIndex: Int = 0
 }
 
-extension SamplingFourierCalculatorImplementation {
+fileprivate extension SamplingFourierCalculatorImplementation {
 
-    fileprivate func claculateFourier() {
+    func setupBindings() {
+        inputSamples.bind { [unowned self] samples in
+            for idx in 0..<samples.count {
+                let inversedSampleIndex = self.sampleIndex.binaryInversed(numberOfDigits: self.order)
+                self.reorderedSamples[inversedSampleIndex] = Float32(samples[idx])
+                self.sampleIndex += 1
+                if self.sampleIndex == self.reorderedSamples.count {
+                    self.sampleIndex = 0
+                    self.claculateFourier()
+                }
+            }
+        }
+
+
+    }
+
+    func claculateFourier() {
         let commandBuffer = commandQueue.makeCommandBuffer()
 
         let inputBufferContents = sharedBuffer.contents().assumingMemoryBound(to: Float32.self)
@@ -91,7 +104,7 @@ extension SamplingFourierCalculatorImplementation {
         inputCopyCommandEncoder?.endEncoding()
 
         let gridSize = MTLSizeMake(samplesNum, 1, 1)
-        let threadGroupSize = MTLSizeMake(min(pipelineState.maxTotalThreadsPerThreadgroup, samplesNum), 1, 1)
+        let threadGroupSize = MTLSizeMake(min(fftPipelineState.maxTotalThreadsPerThreadgroup, samplesNum), 1, 1)
         let buf = [privateBuffer1, privateBuffer2]
 
         for step in 0..<order {
@@ -103,7 +116,7 @@ extension SamplingFourierCalculatorImplementation {
             argEncoder.constantData(at: 2).assumingMemoryBound(to: Int32.self).pointee = Int32(samplesNum)
 
             let computeEncoder = commandBuffer?.makeComputeCommandEncoder()
-            computeEncoder?.setComputePipelineState(pipelineState)
+            computeEncoder?.setComputePipelineState(fftPipelineState)
             computeEncoder?.setBuffer(argBuffer, offset: 0, index: 0)
             computeEncoder?.setBuffer(buf[step % 2], offset: 0, index: 1)
             computeEncoder?.setBuffer(buf[(step+1) % 2], offset: 0, index: 2)
@@ -111,27 +124,25 @@ extension SamplingFourierCalculatorImplementation {
             computeEncoder?.endEncoding()
         }
 
-        // TODO: later change it to calculating of modulus and returnign result in the shared buffer
-        // if there will be no way to calculate fft using single call to compute kernel
-
-        let outputCopyCommandEncoder = commandBuffer?.makeBlitCommandEncoder()
-        outputCopyCommandEncoder?.copy(from: buf[order % 2], sourceOffset: 0,
-                                       to: sharedBuffer, destinationOffset: 0,
-                                       size: samplesNum)
-        outputCopyCommandEncoder?.endEncoding()
+        let modulusGridSize = MTLSizeMake(samplesNum/2, 1, 1)
+        let modulusThreadGroupSize = MTLSizeMake(min(modulusPipelineState.maxTotalThreadsPerThreadgroup, samplesNum/2), 1, 1)
+        let modulusEncoder = commandBuffer?.makeComputeCommandEncoder()
+        modulusEncoder?.setComputePipelineState(modulusPipelineState)
+        modulusEncoder?.setBuffer(buf[order % 2], offset: 0, index: 0)
+        modulusEncoder?.setBuffer(sharedBuffer, offset: 0, index: 1)
+        modulusEncoder?.dispatchThreads(modulusGridSize, threadsPerThreadgroup: modulusThreadGroupSize)
+        modulusEncoder?.endEncoding()
 
         commandBuffer?.addCompletedHandler { [weak self] _ in
             guard let self = self else { return }
-            print("🔥")
 
             let resultContent = self.sharedBuffer.contents().assumingMemoryBound(to: Float32.self)
-            var resultData = [Double].init(repeating: 0, count: self.samplesNum)
-            for i in 0..<self.samplesNum {
-                let modulus = sqrt(resultContent[i*2]*resultContent[i*2] + resultContent[i*2+1]*resultContent[i*2+1])
-                resultData[i] = Double(modulus)
+            var spectrumData = [Double].init(repeating: 0, count: self.samplesNum/2)
+            for i in 0 ..< self.samplesNum/2 {
+                spectrumData[i] = Double(resultContent[i])
             }
 
-            self.delegate?.onFourierCalculated(resultData)
+            self.outputSpectrum.push(spectrumData)
         }
 
         commandBuffer?.commit()
