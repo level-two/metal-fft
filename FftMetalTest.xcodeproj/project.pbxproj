@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9E0161BF241799DB00577A02 /* Fifo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0161BE241799DB00577A02 /* Fifo.swift */; };
 		9E3551ED2410E8D100151738 /* SpectrumAnalyzerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551EC2410E8D100151738 /* SpectrumAnalyzerInteractor.swift */; };
 		9E3551F12410E93100151738 /* SpectrumAnalyzerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551F02410E93100151738 /* SpectrumAnalyzerViewModel.swift */; };
 		9E3551F42410F04A00151738 /* SpectrumAnalyzerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3551F32410F04A00151738 /* SpectrumAnalyzerView.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9E0161BE241799DB00577A02 /* Fifo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fifo.swift; sourceTree = "<group>"; };
 		9E3551EC2410E8D100151738 /* SpectrumAnalyzerInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerInteractor.swift; sourceTree = "<group>"; };
 		9E3551F02410E93100151738 /* SpectrumAnalyzerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerViewModel.swift; sourceTree = "<group>"; };
 		9E3551F32410F04A00151738 /* SpectrumAnalyzerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerView.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */,
 				9EFD9FE92400265700FEFFE3 /* ViewController.swift */,
 				9ECEC1382412734B004E3407 /* Pipe.swift */,
+				9E0161BE241799DB00577A02 /* Fifo.swift */,
 				9EE77D792412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift */,
 				9E3551EE2410E91800151738 /* SpectrumAnalyzer */,
 				9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */,
@@ -236,6 +239,7 @@
 				9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */,
 				9E3551F12410E93100151738 /* SpectrumAnalyzerViewModel.swift in Sources */,
 				9E3551ED2410E8D100151738 /* SpectrumAnalyzerInteractor.swift in Sources */,
+				9E0161BF241799DB00577A02 /* Fifo.swift in Sources */,
 				9E35520F241103BB00151738 /* SamplingFourierCalculatorImplementation.swift in Sources */,
 				9E3551FC2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift in Sources */,
 				9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */,

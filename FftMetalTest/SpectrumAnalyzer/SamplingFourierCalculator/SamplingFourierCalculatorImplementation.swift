@@ -77,14 +77,12 @@ fileprivate extension SamplingFourierCalculatorImplementation {
                 let inversedSampleIndex = self.sampleIndex.binaryInversed(numberOfDigits: self.order)
                 self.reorderedSamples[inversedSampleIndex] = Float32(samples[idx])
                 self.sampleIndex += 1
-                if self.sampleIndex == self.reorderedSamples.count {
+                if self.sampleIndex == self.samplesNum {
                     self.sampleIndex = 0
                     self.claculateFourier()
                 }
             }
         }
-
-
     }
 
     func claculateFourier() {

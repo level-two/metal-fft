@@ -11,6 +11,11 @@ import CoreFoundation
 
 class ViewController: NSViewController {
     var interactor: SpectrumAnalyzerInteractor?
+    let samplesFifo = Fifo<[Double]>(capacity: 1000)
+    var currentTime: Double = 0
+
+    var renderingBlockSimTimer: Timer?
+    var pollingTimer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,24 +25,43 @@ class ViewController: NSViewController {
 
         let interactor = analyzerView.getInteractor()
 
-        let samplesNum = 5000
+        let samplesPerRenderingCall = 512
         let toneFreq = 1234.0
         let sampleRate = 44100.0
 
-        var samples = [Double].init(repeating: 0, count: 512)
-        var idx = 0
+        let refreshRate = 10.0
 
         interactor.isPlaying.push(true)
 
-        for i in 0 ..< samplesNum {
-            let sample = sin(2 * .pi * Double(i) * toneFreq / sampleRate)
+        renderingBlockSimTimer = Timer.scheduledTimer(withTimeInterval: Double(samplesPerRenderingCall)/sampleRate, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
 
-            samples[idx] = sample
-            idx += 1
-            if idx == samples.count {
-                idx = 0
-                interactor.samples.push(samples)
+            var samples = [Double].init(repeating: 0, count: samplesPerRenderingCall)
+
+            for i in 0 ..< samplesPerRenderingCall {
+                samples[i] = sin(2 * .pi * self.currentTime * toneFreq)
+                self.currentTime += 1/sampleRate
+            }
+
+            do {
+                try self.samplesFifo.push(samples)
+            } catch {
+                fatalError(error.localizedDescription)
             }
         }
+
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: 1/refreshRate, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+
+            while !self.samplesFifo.isEmpty {
+                do {
+                    let samples = try self.samplesFifo.pop()
+                    interactor.samples.push(samples)
+                } catch {
+                    fatalError(error.localizedDescription)
+                }
+            }
+        }
+
     }
 }
