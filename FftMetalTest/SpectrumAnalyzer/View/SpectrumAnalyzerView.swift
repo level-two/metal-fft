@@ -83,13 +83,14 @@ extension SpectrumAnalyzerView {
         grid.stroke()
 
         let samples = viewModel.samples
+        let max = samples.max() ?? 1
 
         let spectrum = NSBezierPath()
-        NSColor(red: 158/255, green: 137/255, blue: 43/255, alpha: 1).setStroke()
+        NSColor(red: 158/255, green: 100/255, blue: 20/255, alpha: 1).setStroke()
 
         for i in 0..<samples.count {
             let x = (i == 0) ? 0 : xStep * log10( sampleFreq / 2 * CGFloat(i) / CGFloat(samples.count) )
-            let sampleVal = samples[i]
+            let sampleVal = samples[i]/max
             let yLogVal = (sampleVal < 1e-5) ? -100 : 20 * log10(CGFloat(sampleVal))
             let y = (100 + yLogVal) / 10 * yStep
 
