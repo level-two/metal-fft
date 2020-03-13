@@ -39,28 +39,32 @@ kernel void fftStep(constant ParamBuff &parameters [[buffer(0)]],
     auto step = parameters.step;
     auto samplesNum = parameters.samplesNum;
 
-    auto isEvenHalf = !((i >> step) & 0x1);
+    auto isEvenHalf = ( i & (1 << step) ) == 0;
+    auto sample = inputBuffer[i];
 
-    auto mask = isEvenHalf ? 0 : ((0x1 << step) - 1);
-    auto wi = (i & mask) << (order - step - 1);
-    auto wCoeff = W(wi, samplesNum);
-
-    auto sample = complexMul(inputBuffer[i], wCoeff);
-    resultBuffer[i] = isEvenHalf ? sample : -sample;
-
-    threadgroup_barrier(mem_flags::mem_none);
-
-    auto idx = int(i) + (0x1 << step);
-    if (isEvenHalf) {
-        resultBuffer[idx] += sample;
-    }
-
-    threadgroup_barrier(mem_flags::mem_none);
-
-    idx = int(i) - (0x1 << step);
     if (!isEvenHalf) {
-        resultBuffer[idx] += sample;
+        auto mask = isEvenHalf ? 0 : ((0x1 << step) - 1);
+        auto wi = (i & mask) << (order - step - 1);
+        auto wCoeff = W(wi, samplesNum);
+        sample = -complexMul(sample, wCoeff);
     }
+
+    auto idx = int(i) + (1 << step);
+    if (idx < samplesNum && isEvenHalf) {
+        auto otherSample = inputBuffer[idx];
+        auto mask = (0x1 << step) - 1;
+        auto wi = (idx & mask) << (order - step - 1);
+        auto wCoeff = W(wi, samplesNum);
+        sample += complexMul(otherSample, wCoeff);
+    }
+
+    idx = int(i) - (1 << step);
+    if (idx >= 0 && !isEvenHalf) {
+        auto otherSample = inputBuffer[idx];
+        sample += otherSample;
+    }
+
+    resultBuffer[i] = sample;
 }
 
 kernel void modulus(device const float2* inputBuffer [[buffer(0)]],

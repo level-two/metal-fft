@@ -67,6 +67,8 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
 
     private var reorderedSamples: [Float32]
     private var sampleIndex: Int = 0
+
+    private var isRunning = false
 }
 
 fileprivate extension SamplingFourierCalculatorImplementation {
@@ -86,6 +88,9 @@ fileprivate extension SamplingFourierCalculatorImplementation {
     }
 
     func claculateFourier() {
+        guard !isRunning else { return print("💩") }
+        isRunning = true
+
         let commandBuffer = commandQueue.makeCommandBuffer()
 
         let inputBufferContents = sharedBuffer.contents().assumingMemoryBound(to: Float32.self)
@@ -96,9 +101,10 @@ fileprivate extension SamplingFourierCalculatorImplementation {
 
         // copy input to the private buffer
         let inputCopyCommandEncoder = commandBuffer?.makeBlitCommandEncoder()
+        let bufferSize = samplesNum * MemoryLayout<Float32>.size * 2
         inputCopyCommandEncoder?.copy(from: sharedBuffer, sourceOffset: 0,
                                       to: privateBuffer1, destinationOffset: 0,
-                                      size: samplesNum)
+                                      size: bufferSize)
         inputCopyCommandEncoder?.endEncoding()
 
         let gridSize = MTLSizeMake(samplesNum, 1, 1)
@@ -106,8 +112,12 @@ fileprivate extension SamplingFourierCalculatorImplementation {
         let buf = [privateBuffer1, privateBuffer2]
 
         for step in 0..<order {
+            let inputBuffer = buf[step % 2]
+            let resultBuffer = buf[(step+1) % 2]
+
             let argEncoder = fftFunction.makeArgumentEncoder(bufferIndex: 0)
             let argBuffer = device.makeBuffer(length: argEncoder.encodedLength, options: [])
+            
             argEncoder.setArgumentBuffer(argBuffer, offset: 0)
             argEncoder.constantData(at: 0).assumingMemoryBound(to: Int32.self).pointee = Int32(order)
             argEncoder.constantData(at: 1).assumingMemoryBound(to: Int32.self).pointee = Int32(step)
@@ -116,8 +126,8 @@ fileprivate extension SamplingFourierCalculatorImplementation {
             let computeEncoder = commandBuffer?.makeComputeCommandEncoder()
             computeEncoder?.setComputePipelineState(fftPipelineState)
             computeEncoder?.setBuffer(argBuffer, offset: 0, index: 0)
-            computeEncoder?.setBuffer(buf[step % 2], offset: 0, index: 1)
-            computeEncoder?.setBuffer(buf[(step+1) % 2], offset: 0, index: 2)
+            computeEncoder?.setBuffer(inputBuffer, offset: 0, index: 1)
+            computeEncoder?.setBuffer(resultBuffer, offset: 0, index: 2)
             computeEncoder?.dispatchThreads(gridSize, threadsPerThreadgroup: threadGroupSize)
             computeEncoder?.endEncoding()
         }
@@ -139,8 +149,8 @@ fileprivate extension SamplingFourierCalculatorImplementation {
             for i in 0 ..< self.samplesNum/2 {
                 spectrumData[i] = Double(resultContent[i])
             }
-
             self.outputSpectrum.push(spectrumData)
+            self.isRunning = false
         }
 
         commandBuffer?.commit()
