@@ -26,12 +26,12 @@ class ViewController: NSViewController {
         let interactor = analyzerView.getInteractor()
 
         let samplesPerRenderingCall = 512
-        let toneFreq = 1234.0
+        let toneFreq = 15000.0
         let sampleRate = 44100.0
 
         let refreshRate = 10.0
 
-        interactor.isPlaying.push(true)
+//        interactor.isPlaying.push(true)
 
         renderingBlockSimTimer = Timer.scheduledTimer(withTimeInterval: Double(samplesPerRenderingCall)/sampleRate, repeats: true) { [weak self] _ in
             guard let self = self else { return }
