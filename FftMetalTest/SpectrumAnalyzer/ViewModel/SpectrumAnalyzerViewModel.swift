@@ -11,7 +11,11 @@ import Foundation
 protocol SpectrumAnalyzerViewModel: class {
     func getInteractor() -> SpectrumAnalyzerInteractor
 
-    var samples: [Double] { get }
+    var samples: [CGFloat] { get }
+    var sampleRate: CGFloat { get }
+    var freqRange: (min: CGFloat, max: CGFloat) { get }
+    var sampleValuesRange: (min: CGFloat, max: CGFloat) { get }
+    
     var delegate: SpectrumAnalyzerViewModelDelegate? { get set }
 
     func viewVisibilityChanged(isVisible: Bool)

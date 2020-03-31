@@ -8,30 +8,39 @@
 
 import Cocoa
 
-@IBDesignable
-public class SpectrumAnalyzerView: NSView {
-    override public var intrinsicContentSize: CGSize {
-        return CGSize(width: 100, height: 100)
-    }
+@IBDesignable public final class SpectrumAnalyzerView: NSView {
+//    override public func awakeFromNib() {
+//        super.awakeFromNib()
+//        setup()
+//    }
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        setup()
     }
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        commonInit()
+        setup()
     }
 
-    private var token: NSKeyValueObservation?
+    override public var intrinsicContentSize: CGSize {
+        return CGSize(width: 100, height: 100)
+    }
 
+    public override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        plot(points: plotPoints)
+    }
+
+    private var observationTokens = [NSKeyValueObservation]()
     private let viewModel: SpectrumAnalyzerViewModel = SpectrumAnalyzerDefaultViewModel()
-
-    let logSteps: [CGFloat] = stride(from: 2, to: 9, by: 1).map(log10)
+    private var roundedXValues = [CGFloat]()
 }
 
 extension SpectrumAnalyzerView {
+    // TODO: Refactor this to make it publicly accessiblie - probably using protocol
+    // to introduce particular interface conformance for the view instantiated from the nib
     func getInteractor() -> SpectrumAnalyzerInteractor {
         return viewModel.getInteractor()
     }
@@ -44,22 +53,99 @@ extension SpectrumAnalyzerView: SpectrumAnalyzerViewModelDelegate {
 }
 
 fileprivate extension SpectrumAnalyzerView {
-    func commonInit() {
-        viewModel.delegate = self
+    func setup() {
+        setViewModelDelegate()
+        setObservationCallbacks()
+        precalculateXValues()
+        notifyViewModelOfVisibilityState()
+    }
 
-        token = observe(\.isHidden) { [weak self] _, change in
+    func setViewModelDelegate() {
+        viewModel.delegate = self
+    }
+
+    func setObservationCallbacks() {
+        let isHiddenToken = observe(\.isHidden) { [weak self] _, change in
             guard let isHidden = change.newValue else { return }
             self?.viewModel.viewVisibilityChanged(isVisible: !isHidden)
         }
 
+        let boundsToken = observe(\.bounds) { [weak self] _, _ in
+            self?.precalculateXValues()
+            self?.redraw()
+        }
+
+        observationTokens = [isHiddenToken, boundsToken]
+    }
+
+    func notifyViewModelOfVisibilityState() {
         viewModel.viewVisibilityChanged(isVisible: !isHidden)
     }
 }
 
-extension SpectrumAnalyzerView {
-    public override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
+fileprivate extension SpectrumAnalyzerView {
+    func plot(points: [NSPoint]) {
+        guard points.count != 0 else { return }
+        NSColor(red: 158/255, green: 137/255, blue: 43/255, alpha: 1).setStroke()
+        let graph = NSBezierPath()
+        graph.move(to: points[0])
+        points.forEach(graph.line)
+        graph.stroke()
+    }
+}
 
+fileprivate extension SpectrumAnalyzerView {
+
+    func precalculateXValues() {
+        let minFreq = viewModel.freqRange.min
+        let maxFreq = viewModel.freqRange.max
+        let samplesNum = viewModel.sampleRate/2
+
+        let logFreqValues = stride(from: 0, to: samplesNum, by: 1).map {
+            log10(minFreq + (maxFreq - minFreq) * $0 / samplesNum)
+        }
+
+        let minLogFreq = logFreqValues.first!
+        let maxLogFreq = logFreqValues.last!
+
+        let xValues = logFreqValues.map {
+            ($0 - minLogFreq)/(maxLogFreq - minLogFreq) * bounds.width
+        }
+
+        roundedXValues = xValues.map { $0.rounded(.down) }
+    }
+
+    var plotPoints: [NSPoint] {
+        let minSampleVal = viewModel.sampleValuesRange.min
+        let maxSampleVal = viewModel.sampleValuesRange.max
+
+        func y(for val: CGFloat) -> CGFloat {
+            return bounds.height * val / (maxSampleVal - minSampleVal)
+        }
+
+        var prevX = CGFloat(-1)
+        var maxVal = -CGFloat.infinity
+        var points = [NSPoint]()
+
+        for i in 0..<viewModel.samples.count {
+            let x = roundedXValues[i]
+            let val = viewModel.samples[i]
+
+            guard x != prevX else {
+                maxVal = max(maxVal, val)
+                points[points.count - 1] = NSPoint(x: x, y: y(for: maxVal))
+                continue
+            }
+
+            points.append(NSPoint(x: x, y: y(for: val)))
+            prevX = x
+            maxVal = val
+        }
+        return points
+    }
+}
+
+/*
 //        let sampleFreq = CGFloat(44100.0)
 //
 //        let maxFreq = sampleFreq / 2
@@ -93,12 +179,6 @@ extension SpectrumAnalyzerView {
 //        grid.stroke()
 //
 //
-//
-//
-//
-//
-//
-//
 //        let samples = viewModel.samples
 //        let max = samples.max() ?? 1
 //
@@ -121,7 +201,6 @@ extension SpectrumAnalyzerView {
 //
 //        spectrum.stroke()
     }
-
 }
 
 fileprivate extension SpectrumAnalyzerView {
@@ -188,3 +267,4 @@ fileprivate extension SpectrumAnalyzerView {
 //        grid.stroke()
 //    }
 }
+*/

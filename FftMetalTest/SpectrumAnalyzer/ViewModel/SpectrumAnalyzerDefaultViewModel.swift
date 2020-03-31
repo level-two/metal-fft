@@ -9,18 +9,25 @@
 import Foundation
 
 class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
-    var samples: [Double]
+    var samples: [CGFloat]
+    var sampleRate: CGFloat
+    var freqRange: (min: CGFloat, max: CGFloat)
+    var sampleValuesRange: (min: CGFloat, max: CGFloat)
     var delegate: SpectrumAnalyzerViewModelDelegate?
 
     init() {
         isVisible = false
         isPlaying = false
+
+        // TODO: Calc those values or get them from model
         order = 12
+        sampleRate = CGFloat(1 << order)
+        freqRange = (min: 10, max: 22050)
+        sampleValuesRange = (min:-150, max: 10)
 
         samples = []
 
         interactor = SpectrumAnalyzerDefaultInteractor()
-
         interactor.isPlaying.bindOnMain { [weak self] isPlaying in
             self?.isPlaying = isPlaying
         }
@@ -59,7 +66,7 @@ fileprivate extension SpectrumAnalyzerDefaultViewModel {
             samplingFourierCalculator = SamplingFourierCalculatorImplementation(order: order)
             interactor.samples.bindOnMain(to: samplingFourierCalculator?.inputSamples)
             samplingFourierCalculator?.outputSpectrum.bindOnMain { [weak self] spectrumData in
-                self?.samples = spectrumData
+                self?.samples = spectrumData.map(CGFloat.init)
                 self?.delegate?.redraw()
             }
         }

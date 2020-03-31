@@ -11,8 +11,8 @@ import CoreFoundation
 
 class ViewController: NSViewController {
     var interactor: SpectrumAnalyzerInteractor?
-    let samplesFifo = Fifo<[Double]>(capacity: 1000)
-    var currentTime: Double = 0
+    let samplesFifo = Fifo<[Float32]>(capacity: 1000)
+    var currentTime: Float32 = 0
 
     var renderingBlockSimTimer: Timer?
     var pollingTimer: Timer?
@@ -26,20 +26,20 @@ class ViewController: NSViewController {
         let interactor = analyzerView.getInteractor()
 
         let samplesPerRenderingCall = 512
-        let toneFreq = 15000.0
-        let sampleRate = 44100.0
+        let toneFreq = Float32(1024.1)
+        let sampleRate = Float32(44100.0)
 
         let refreshRate = 10.0
 
-//        interactor.isPlaying.push(true)
+        interactor.isPlaying.push(true)
 
-        renderingBlockSimTimer = Timer.scheduledTimer(withTimeInterval: Double(samplesPerRenderingCall)/sampleRate, repeats: true) { [weak self] _ in
+        renderingBlockSimTimer = Timer.scheduledTimer(withTimeInterval: Double(samplesPerRenderingCall)/Double(sampleRate), repeats: true) { [weak self] _ in
             guard let self = self else { return }
 
-            var samples = [Double].init(repeating: 0, count: samplesPerRenderingCall)
+            var samples = [Float32].init(repeating: 0, count: samplesPerRenderingCall)
 
             for i in 0 ..< samplesPerRenderingCall {
-                samples[i] = sin(2 * .pi * self.currentTime * toneFreq)
+                samples[i] = sin(2 * Float32.pi * self.currentTime * toneFreq)
                 self.currentTime += 1/sampleRate
             }
 
