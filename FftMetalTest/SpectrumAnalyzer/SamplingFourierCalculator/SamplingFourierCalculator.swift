@@ -8,6 +8,6 @@
 
 protocol SamplingFourierCalculator {
     init?(order: Int)
-    var inputSamples: Pipe<[Double]> { get }
-    var outputSpectrum: Pipe<[Double]> { get }
+    var inputSamples: Pipe<[Float32]> { get }
+    var outputSpectrum: Pipe<[Float32]> { get }
 }

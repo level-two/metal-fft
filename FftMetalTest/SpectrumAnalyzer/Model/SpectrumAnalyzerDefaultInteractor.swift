@@ -8,5 +8,5 @@
 
 struct SpectrumAnalyzerDefaultInteractor: SpectrumAnalyzerInteractor {
     let isPlaying = Pipe<Bool>()
-    let samples = Pipe<[Double]>()
+    let samples = Pipe<[Float32]>()
 }

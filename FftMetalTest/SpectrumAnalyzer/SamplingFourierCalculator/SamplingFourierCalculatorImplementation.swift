@@ -9,8 +9,8 @@
 import Metal
 
 final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
-    let inputSamples = Pipe<[Double]>()
-    let outputSpectrum = Pipe<[Double]>()
+    let inputSamples = Pipe<[Float32]>()
+    let outputSpectrum = Pipe<[Float32]>()
 
     init?(order: Int) {
         self.order = order
@@ -77,7 +77,7 @@ fileprivate extension SamplingFourierCalculatorImplementation {
         inputSamples.bind { [unowned self] samples in
             for idx in 0..<samples.count {
                 let inversedSampleIndex = self.sampleIndex.binaryInversed(numberOfDigits: self.order)
-                self.reorderedSamples[inversedSampleIndex] = Float32(samples[idx])
+                self.reorderedSamples[inversedSampleIndex] = samples[idx]
                 self.sampleIndex += 1
                 if self.sampleIndex == self.samplesNum {
                     self.sampleIndex = 0
@@ -145,9 +145,9 @@ fileprivate extension SamplingFourierCalculatorImplementation {
             guard let self = self else { return }
 
             let resultContent = self.sharedBuffer.contents().assumingMemoryBound(to: Float32.self)
-            var spectrumData = [Double].init(repeating: 0, count: self.samplesNum/2)
+            var spectrumData = [Float32].init(repeating: 0, count: self.samplesNum/2)
             for i in 0 ..< self.samplesNum/2 {
-                spectrumData[i] = Double(resultContent[i])
+                spectrumData[i] = resultContent[i]
             }
             self.outputSpectrum.push(spectrumData)
             self.isRunning = false

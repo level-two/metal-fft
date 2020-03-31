@@ -8,5 +8,5 @@
 
 protocol SpectrumAnalyzerInteractor {
     var isPlaying: Pipe<Bool> { get }
-    var samples: Pipe<[Double]> { get }
+    var samples: Pipe<[Float32]> { get }
 }
