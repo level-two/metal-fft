@@ -26,10 +26,32 @@ import Cocoa
         setup()
     }
 
+    func configure(with viewModel: SpectrumAnalyzerViewModel) {
+        minFreq = viewModel.freqRange.min
+        maxFreq = viewModel.freqRange.max
+        samplesNum = viewModel.sampleRate/2
+        minSampleVal = viewModel.sampleValuesRange.min
+        maxSampleVal = viewModel.sampleValuesRange.max
+
+        precalculateXValues()
+    }
+
+    func update(with viewModel: SpectrumAnalyzerViewModel) {
+        samples = viewModel.samples
+        self.setNeedsDisplay(bounds)
+    }
+
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         plot(points: plotPoints)
     }
+
+    private var minFreq: CGFloat?
+    private var maxFreq: CGFloat?
+    private var samplesNum: CGFloat?
+    private var minSampleVal: CGFloat?
+    private var maxSampleVal: CGFloat?
+    private var samples: [CGFloat] = []
 
     private var boundsChangeObservationToken: NSKeyValueObservation?
     private var roundedXValues = [CGFloat]()
@@ -63,9 +85,10 @@ fileprivate extension SpectrumAnalyzerGraphView {
 
 fileprivate extension SpectrumAnalyzerGraphView {
     func precalculateXValues() {
-        let minFreq = viewModel.freqRange.min
-        let maxFreq = viewModel.freqRange.max
-        let samplesNum = viewModel.sampleRate/2
+        guard let minFreq = minFreq,
+            let maxFreq = maxFreq,
+            let samplesNum = samplesNum
+            else { return }
 
         let logFreqValues = stride(from: 0, to: samplesNum, by: 1).map {
             log10(minFreq + (maxFreq - minFreq) * $0 / samplesNum)
@@ -82,8 +105,12 @@ fileprivate extension SpectrumAnalyzerGraphView {
     }
 
     var plotPoints: [NSPoint] {
-        let minSampleVal = viewModel.sampleValuesRange.min
-        let maxSampleVal = viewModel.sampleValuesRange.max
+        guard let minFreq = minFreq,
+            let maxFreq = maxFreq,
+            let samplesNum = samplesNum,
+            let minSampleVal = minSampleVal,
+            let maxSampleVal = maxSampleVal
+            else { return [] }
 
         func y(for val: CGFloat) -> CGFloat {
             return bounds.height * val / (maxSampleVal - minSampleVal)
@@ -93,9 +120,9 @@ fileprivate extension SpectrumAnalyzerGraphView {
         var maxVal = -CGFloat.infinity
         var points = [NSPoint]()
 
-        for i in 0..<viewModel.samples.count {
+        for i in 0..<samples.count {
             let x = roundedXValues[i]
-            let val = viewModel.samples[i]
+            let val = samples[i]
 
             guard x != prevX else {
                 maxVal = max(maxVal, val)
@@ -110,4 +137,3 @@ fileprivate extension SpectrumAnalyzerGraphView {
         return points
     }
 }
-

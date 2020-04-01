@@ -26,10 +26,23 @@ import Cocoa
         setup()
     }
 
+    func configure(with viewModel: SpectrumAnalyzerViewModel) {
+        minFreq = viewModel.freqRange.min
+        maxFreq = viewModel.freqRange.max
+        minSampleVal = viewModel.sampleValuesRange.min
+        maxSampleVal = viewModel.sampleValuesRange.max
+    }
+
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        drawGrid()
+        drawXGrid()
+        drawYGrid()
     }
+
+    private var minFreq: CGFloat?
+    private var maxFreq: CGFloat?
+    private var minSampleVal: CGFloat?
+    private var maxSampleVal: CGFloat?
 }
 
 fileprivate extension SpectrumAnalyzerGridView {
@@ -39,13 +52,11 @@ fileprivate extension SpectrumAnalyzerGridView {
 }
 
 fileprivate extension SpectrumAnalyzerGridView {
-    func drawGrid() {
+    func drawXGrid() {
+        guard let minFreq = minFreq, let maxFreq = maxFreq else { return }
 
         NSColor.black.drawSwatch(in: bounds)
 
-        let sampleRate: CGFloat = 44100
-        let minFreq: CGFloat = 10
-        let maxFreq = sampleRate/2
         let minLogFreq = log10(minFreq)
         let maxLogFreq = log10(maxFreq)
         let substeps: [CGFloat] = [0] + stride(from: 2, to: 10, by: 1).map(log10)
@@ -74,11 +85,21 @@ fileprivate extension SpectrumAnalyzerGridView {
             grid.line(to: CGPoint(x: x, y: bounds.height))
         }
         grid.stroke()
+    }
 
-//        for y in stride(from: 0, to: dirtyRect.height, by: yStep) {
-//            grid.move(to: CGPoint(x: 0, y: y))
-//            grid.line(to: CGPoint(x: dirtyRect.width, y: y))
-//        }
+    func drawYGrid() {
+        guard let minSampleVal = minSampleVal, let maxSampleVal = maxSampleVal else { return }
+
+        let yStep: CGFloat = 20
+
+        let grid = NSBezierPath()
+        NSColor(red: 158/255, green: 137/255, blue: 43/255, alpha: 1).setStroke()
+        for step in stride(from: minSampleVal, to: maxSampleVal, by: yStep) {
+            let y = bounds.height * (step - minSampleVal) / (maxSampleVal - minSampleVal)
+            grid.move(to: CGPoint(x: 0, y: y))
+            grid.line(to: CGPoint(x: bounds.width, y: y))
+        }
+        grid.stroke()
     }
 }
 

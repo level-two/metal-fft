@@ -9,17 +9,27 @@
 import Cocoa
 
 @IBDesignable public final class SpectrumAnalyzerView: NSView {
-    @IBOutlet var gridView: SpectrumAnalyzerGridView?
-    @IBOutlet var graphView: SpectrumAnalyzerGraphView?
+//    override public func awakeFromNib() {
+//        super.awakeFromNib()
+//        setup()
+//    }
 
-    override public func awakeFromNib() {
-        super.awakeFromNib()
+    public override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder decoder: NSCoder) {
+        super.init(coder: decoder)
         setup()
     }
 
     override public var intrinsicContentSize: CGSize {
         return CGSize(width: 100, height: 100)
     }
+
+    private var gridView: SpectrumAnalyzerGridView?
+    private var graphView: SpectrumAnalyzerGraphView?
 
     private var isHiddenToken: NSKeyValueObservation?
     private let viewModel: SpectrumAnalyzerViewModel = SpectrumAnalyzerDefaultViewModel()
@@ -35,15 +45,33 @@ extension SpectrumAnalyzerView {
 
 extension SpectrumAnalyzerView: SpectrumAnalyzerViewModelDelegate {
     func redraw() {
-        self.setNeedsDisplay(bounds)
+        graphView?.update(with: viewModel)
     }
 }
 
 fileprivate extension SpectrumAnalyzerView {
     func setup() {
+        addSubviews()
         setViewModelDelegate()
         observeHiddenState()
         notifyViewModelOfVisibilityState()
+    }
+
+    func addSubviews() {
+        self.gridView = SpectrumAnalyzerGridView()
+        self.graphView = SpectrumAnalyzerGraphView()
+
+        [gridView, graphView].compactMap { $0 }.forEach { view in
+            addSubview(view)
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+            view.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+            view.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+            view.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        }
+
+        gridView?.configure(with: viewModel)
+        graphView?.configure(with: viewModel)
     }
 
     func setViewModelDelegate() {
