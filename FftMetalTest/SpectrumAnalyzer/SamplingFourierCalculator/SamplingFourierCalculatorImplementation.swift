@@ -22,8 +22,8 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
             let defaultLibrary = device.makeDefaultLibrary(),
             let fftFunction = defaultLibrary.makeFunction(name: "fftStep"),
             let fftPipelineState = try? device.makeComputePipelineState(function: fftFunction),
-            let modulusFunction = defaultLibrary.makeFunction(name: "modulus"),
-            let modulusPipelineState = try? device.makeComputePipelineState(function: modulusFunction),
+            let modLgFunction = defaultLibrary.makeFunction(name: "modLg"),
+            let modLgPipelineState = try? device.makeComputePipelineState(function: modLgFunction),
             let commandQueue = device.makeCommandQueue()
             else { return nil }
 
@@ -31,8 +31,8 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
         self.defaultLibrary = defaultLibrary
         self.fftFunction = fftFunction
         self.fftPipelineState = fftPipelineState
-        self.modulusFunction = modulusFunction
-        self.modulusPipelineState = modulusPipelineState
+        self.modLgFunction = modLgFunction
+        self.modLgPipelineState = modLgPipelineState
         self.commandQueue = commandQueue
 
         let bufferSize = samplesNum * MemoryLayout<Float32>.size * 2
@@ -57,8 +57,8 @@ final class SamplingFourierCalculatorImplementation: SamplingFourierCalculator {
     private let defaultLibrary: MTLLibrary
     private let fftFunction: MTLFunction
     private let fftPipelineState: MTLComputePipelineState
-    private let modulusFunction: MTLFunction
-    private let modulusPipelineState: MTLComputePipelineState
+    private let modLgFunction: MTLFunction
+    private let modLgPipelineState: MTLComputePipelineState
     private let commandQueue: MTLCommandQueue
 
     private let sharedBuffer: MTLBuffer
@@ -91,55 +91,50 @@ fileprivate extension SamplingFourierCalculatorImplementation {
         guard !isRunning else { return print("💩") }
         isRunning = true
 
-        let commandBuffer = commandQueue.makeCommandBuffer()
-
         let inputBufferContents = sharedBuffer.contents().assumingMemoryBound(to: Float32.self)
         for i in 0 ..< samplesNum {
             inputBufferContents[i << 1] = reorderedSamples[i]
             inputBufferContents[(i << 1) + 1] = 0
         }
 
-        // copy input to the private buffer
-        let inputCopyCommandEncoder = commandBuffer?.makeBlitCommandEncoder()
-        let bufferSize = samplesNum * MemoryLayout<Float32>.size * 2
-        inputCopyCommandEncoder?.copy(from: sharedBuffer, sourceOffset: 0,
-                                      to: privateBuffer1, destinationOffset: 0,
-                                      size: bufferSize)
-        inputCopyCommandEncoder?.endEncoding()
+        let commandBuffer = commandQueue.makeCommandBuffer()
 
-        let gridSize = MTLSizeMake(samplesNum, 1, 1)
-        let threadGroupSize = MTLSizeMake(min(fftPipelineState.maxTotalThreadsPerThreadgroup, samplesNum), 1, 1)
-        let buf = [privateBuffer1, privateBuffer2]
+        commandBuffer?.blitCommand {
+            let bufferSize = samplesNum * MemoryLayout<Float32>.size * 2
+            $0.copy(from: sharedBuffer, sourceOffset: 0, to: privateBuffer1, destinationOffset: 0, size: bufferSize)
+        }
 
         for step in 0..<order {
-            let inputBuffer = buf[step % 2]
-            let resultBuffer = buf[(step+1) % 2]
-
             let argEncoder = fftFunction.makeArgumentEncoder(bufferIndex: 0)
             let argBuffer = device.makeBuffer(length: argEncoder.encodedLength, options: [])
-            
             argEncoder.setArgumentBuffer(argBuffer, offset: 0)
             argEncoder.constantData(at: 0).assumingMemoryBound(to: Int32.self).pointee = Int32(order)
             argEncoder.constantData(at: 1).assumingMemoryBound(to: Int32.self).pointee = Int32(step)
             argEncoder.constantData(at: 2).assumingMemoryBound(to: Int32.self).pointee = Int32(samplesNum)
 
-            let computeEncoder = commandBuffer?.makeComputeCommandEncoder()
-            computeEncoder?.setComputePipelineState(fftPipelineState)
-            computeEncoder?.setBuffer(argBuffer, offset: 0, index: 0)
-            computeEncoder?.setBuffer(inputBuffer, offset: 0, index: 1)
-            computeEncoder?.setBuffer(resultBuffer, offset: 0, index: 2)
-            computeEncoder?.dispatchThreads(gridSize, threadsPerThreadgroup: threadGroupSize)
-            computeEncoder?.endEncoding()
+            let inputBuffer = step.even ? privateBuffer1 : privateBuffer2
+            let resultBuffer = step.even ? privateBuffer2 : privateBuffer1
+
+            let gridSize = MTLSizeMake(samplesNum, 1, 1)
+            let threadGroupSize = MTLSizeMake(min(fftPipelineState.maxTotalThreadsPerThreadgroup, samplesNum), 1, 1)
+
+            commandBuffer?.computeCommand(fftPipelineState) {
+                $0.setBuffer(argBuffer, offset: 0, index: 0)
+                $0.setBuffer(inputBuffer, offset: 0, index: 1)
+                $0.setBuffer(resultBuffer, offset: 0, index: 2)
+                $0.dispatchThreads(gridSize, threadsPerThreadgroup: threadGroupSize)
+            }
         }
 
-        let modulusGridSize = MTLSizeMake(samplesNum/2, 1, 1)
-        let modulusThreadGroupSize = MTLSizeMake(min(modulusPipelineState.maxTotalThreadsPerThreadgroup, samplesNum/2), 1, 1)
-        let modulusEncoder = commandBuffer?.makeComputeCommandEncoder()
-        modulusEncoder?.setComputePipelineState(modulusPipelineState)
-        modulusEncoder?.setBuffer(buf[order % 2], offset: 0, index: 0)
-        modulusEncoder?.setBuffer(sharedBuffer, offset: 0, index: 1)
-        modulusEncoder?.dispatchThreads(modulusGridSize, threadsPerThreadgroup: modulusThreadGroupSize)
-        modulusEncoder?.endEncoding()
+        let gridSize = MTLSizeMake(samplesNum/2, 1, 1)
+        let threadGroupSize = MTLSizeMake(min(modLgPipelineState.maxTotalThreadsPerThreadgroup, samplesNum/2), 1, 1)
+        let inputBuffer = order.even ? privateBuffer1 : privateBuffer2
+
+        commandBuffer?.computeCommand(modLgPipelineState) {
+            $0.setBuffer(inputBuffer, offset: 0, index: 0)
+            $0.setBuffer(sharedBuffer, offset: 0, index: 1)
+            $0.dispatchThreads(gridSize, threadsPerThreadgroup: threadGroupSize)
+        }
 
         commandBuffer?.addCompletedHandler { [weak self] _ in
             guard let self = self else { return }

@@ -13,6 +13,7 @@ protocol SpectrumAnalyzerViewModel: class {
 
     var samples: [CGFloat] { get }
     var sampleRate: CGFloat { get }
+    var samplesNumber: CGFloat { get }
     var freqRange: (min: CGFloat, max: CGFloat) { get }
     var sampleValuesRange: (min: CGFloat, max: CGFloat) { get }
     

@@ -18,10 +18,11 @@
 		9E38EC0524338C2B00C7245C /* SpectrumAnalyzerGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E38EC0424338C2B00C7245C /* SpectrumAnalyzerGridView.swift */; };
 		9E38EC0A243495A800C7245C /* SpectrumAnalyzerGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E38EC09243495A800C7245C /* SpectrumAnalyzerGraphView.swift */; };
 		9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */; };
-		9E515129241D2B3800DE5A02 /* CGFloat+magnitudeOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E515128241D2B3700DE5A02 /* CGFloat+magnitudeOrder.swift */; };
 		9ECEC1392412734B004E3407 /* Pipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ECEC1382412734B004E3407 /* Pipe.swift */; };
 		9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */; };
 		9EE77D7A2412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE77D792412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift */; };
+		9EF6C99F243541BF0082B936 /* MTLCommandBuffer+commandHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF6C99E243541BF0082B936 /* MTLCommandBuffer+commandHelpers.swift */; };
+		9EF6C9A1243549C10082B936 /* Int+even.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF6C9A0243549C10082B936 /* Int+even.swift */; };
 		9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */; };
 		9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFD9FE92400265700FEFFE3 /* ViewController.swift */; };
 		9EFD9FEC2400265A00FEFFE3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EFD9FEB2400265A00FEFFE3 /* Assets.xcassets */; };
@@ -41,10 +42,11 @@
 		9E38EC0424338C2B00C7245C /* SpectrumAnalyzerGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerGridView.swift; sourceTree = "<group>"; };
 		9E38EC09243495A800C7245C /* SpectrumAnalyzerGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerGraphView.swift; sourceTree = "<group>"; };
 		9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+binaryInversed.swift"; sourceTree = "<group>"; };
-		9E515128241D2B3700DE5A02 /* CGFloat+magnitudeOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+magnitudeOrder.swift"; sourceTree = "<group>"; };
 		9ECEC1382412734B004E3407 /* Pipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pipe.swift; sourceTree = "<group>"; };
 		9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculator.swift; sourceTree = "<group>"; };
 		9EE77D792412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSView+bindFrameToSuperviewBounds.swift"; sourceTree = "<group>"; };
+		9EF6C99E243541BF0082B936 /* MTLCommandBuffer+commandHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLCommandBuffer+commandHelpers.swift"; sourceTree = "<group>"; };
+		9EF6C9A0243549C10082B936 /* Int+even.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+even.swift"; sourceTree = "<group>"; };
 		9EFD9FE42400265700FEFFE3 /* FftMetalTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FftMetalTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EFD9FE72400265700FEFFE3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EFD9FE92400265700FEFFE3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -120,8 +122,9 @@
 		9EF644DC241154CE007D2E2E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9EF6C99E243541BF0082B936 /* MTLCommandBuffer+commandHelpers.swift */,
 				9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */,
-				9E515128241D2B3700DE5A02 /* CGFloat+magnitudeOrder.swift */,
+				9EF6C9A0243549C10082B936 /* Int+even.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -238,7 +241,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9ECEC1392412734B004E3407 /* Pipe.swift in Sources */,
-				9E515129241D2B3800DE5A02 /* CGFloat+magnitudeOrder.swift in Sources */,
 				9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */,
 				9EFD9FF82400267C00FEFFE3 /* fft.metal in Sources */,
 				9E3551F42410F04A00151738 /* SpectrumAnalyzerView.swift in Sources */,
@@ -248,11 +250,13 @@
 				9E3552042410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift in Sources */,
 				9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */,
 				9E38EC0A243495A800C7245C /* SpectrumAnalyzerGraphView.swift in Sources */,
+				9EF6C99F243541BF0082B936 /* MTLCommandBuffer+commandHelpers.swift in Sources */,
 				9E3551F12410E93100151738 /* SpectrumAnalyzerViewModel.swift in Sources */,
 				9E3551ED2410E8D100151738 /* SpectrumAnalyzerInteractor.swift in Sources */,
 				9E0161BF241799DB00577A02 /* Fifo.swift in Sources */,
 				9E35520F241103BB00151738 /* SamplingFourierCalculatorImplementation.swift in Sources */,
 				9E3551FC2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift in Sources */,
+				9EF6C9A1243549C10082B936 /* Int+even.swift in Sources */,
 				9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */,
 				9E38EC0524338C2B00C7245C /* SpectrumAnalyzerGridView.swift in Sources */,
 			);

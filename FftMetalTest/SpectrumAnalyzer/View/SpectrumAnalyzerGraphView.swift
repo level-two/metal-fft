@@ -29,7 +29,7 @@ import Cocoa
     func configure(with viewModel: SpectrumAnalyzerViewModel) {
         minFreq = viewModel.freqRange.min
         maxFreq = viewModel.freqRange.max
-        samplesNum = viewModel.sampleRate/2
+        samplesNum = viewModel.samplesNumber/2
         minSampleVal = viewModel.sampleValuesRange.min
         maxSampleVal = viewModel.sampleValuesRange.max
 
@@ -53,17 +53,17 @@ import Cocoa
     private var maxSampleVal: CGFloat?
     private var samples: [CGFloat] = []
 
-    private var boundsChangeObservationToken: NSKeyValueObservation?
+    private var frameChangeObservationToken: NSKeyValueObservation?
     private var roundedXValues = [CGFloat]()
 }
 
 fileprivate extension SpectrumAnalyzerGraphView {
     func setup() {
-        // TBD
+        observeFrameChange()
     }
 
-    func observeBoundsChange() {
-        boundsChangeObservationToken = observe(\.bounds) { [weak self] _, _ in
+    func observeFrameChange() {
+        frameChangeObservationToken = observe(\.frame) { [weak self] _, _ in
             guard let self = self else { return }
             self.precalculateXValues()
             self.setNeedsDisplay(self.bounds)
@@ -124,7 +124,7 @@ fileprivate extension SpectrumAnalyzerGraphView {
             let x = roundedXValues[i]
             let val = samples[i]
 
-            guard x != prevX else {
+            if x == prevX {
                 maxVal = max(maxVal, val)
                 points[points.count - 1] = NSPoint(x: x, y: y(for: maxVal))
                 continue

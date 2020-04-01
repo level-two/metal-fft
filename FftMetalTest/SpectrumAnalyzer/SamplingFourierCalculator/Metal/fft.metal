@@ -67,10 +67,11 @@ kernel void fftStep(constant ParamBuff &parameters [[buffer(0)]],
     resultBuffer[i] = sample;
 }
 
-kernel void modulus(device const float2* inputBuffer [[buffer(0)]],
+kernel void modLg(device const float2* inputBuffer [[buffer(0)]],
                     device float* resultBuffer [[buffer(1)]],
                     uint i [[thread_position_in_grid]]) {
 
-    resultBuffer[i] = complexModulus(inputBuffer[i]);
+    auto modulus = complexModulus(inputBuffer[i]);
+    resultBuffer[i] = log10(modulus);
 }
 

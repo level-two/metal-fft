@@ -13,6 +13,7 @@ class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
     var sampleRate: CGFloat
     var freqRange: (min: CGFloat, max: CGFloat)
     var sampleValuesRange: (min: CGFloat, max: CGFloat)
+    var samplesNumber: CGFloat
     var delegate: SpectrumAnalyzerViewModelDelegate?
 
     init() {
@@ -21,8 +22,10 @@ class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
 
         // TODO: Calc those values or get them from model
         order = 12
-        sampleRate = CGFloat(1 << order)
-        freqRange = (min: 10, max: 22050)
+        samplesNumber = CGFloat(1 << order)
+        sampleRate = 44100
+
+        freqRange = (min: sampleRate/(2*samplesNumber), max: sampleRate/2)
         sampleValuesRange = (min:-150, max: 10)
 
         samples = []
