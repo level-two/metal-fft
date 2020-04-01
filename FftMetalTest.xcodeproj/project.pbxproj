@@ -15,8 +15,10 @@
 		9E3552042410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3552032410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift */; };
 		9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift */; };
 		9E35520F241103BB00151738 /* SamplingFourierCalculatorImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35520D241103BB00151738 /* SamplingFourierCalculatorImplementation.swift */; };
+		9E38EC0524338C2B00C7245C /* SpectrumAnalyzerGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E38EC0424338C2B00C7245C /* SpectrumAnalyzerGridView.swift */; };
+		9E38EC0A243495A800C7245C /* SpectrumAnalyzerGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E38EC09243495A800C7245C /* SpectrumAnalyzerGraphView.swift */; };
+		9E38EC0C24349C1000C7245C /* SpectrumAnalyzerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9E38EC0B24349C1000C7245C /* SpectrumAnalyzerView.xib */; };
 		9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */; };
-		9E515127241BDB6800DE5A02 /* AxisMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E515126241BDB6800DE5A02 /* AxisMode.swift */; };
 		9E515129241D2B3800DE5A02 /* CGFloat+magnitudeOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E515128241D2B3700DE5A02 /* CGFloat+magnitudeOrder.swift */; };
 		9ECEC1392412734B004E3407 /* Pipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ECEC1382412734B004E3407 /* Pipe.swift */; };
 		9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */; };
@@ -37,8 +39,10 @@
 		9E3552032410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerDefaultViewModel.swift; sourceTree = "<group>"; };
 		9E3552052410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerDefaultInteractor.swift; sourceTree = "<group>"; };
 		9E35520D241103BB00151738 /* SamplingFourierCalculatorImplementation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculatorImplementation.swift; sourceTree = "<group>"; };
+		9E38EC0424338C2B00C7245C /* SpectrumAnalyzerGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerGridView.swift; sourceTree = "<group>"; };
+		9E38EC09243495A800C7245C /* SpectrumAnalyzerGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzerGraphView.swift; sourceTree = "<group>"; };
+		9E38EC0B24349C1000C7245C /* SpectrumAnalyzerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SpectrumAnalyzerView.xib; sourceTree = "<group>"; };
 		9E3906D3240EBEB2000ABCDB /* Int+binaryInversed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+binaryInversed.swift"; sourceTree = "<group>"; };
-		9E515126241BDB6800DE5A02 /* AxisMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisMode.swift; sourceTree = "<group>"; };
 		9E515128241D2B3700DE5A02 /* CGFloat+magnitudeOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+magnitudeOrder.swift"; sourceTree = "<group>"; };
 		9ECEC1382412734B004E3407 /* Pipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pipe.swift; sourceTree = "<group>"; };
 		9EE77D75241294E900936BED /* SamplingFourierCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplingFourierCalculator.swift; sourceTree = "<group>"; };
@@ -97,8 +101,10 @@
 		9E3551F52410F05600151738 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				9E38EC0B24349C1000C7245C /* SpectrumAnalyzerView.xib */,
 				9E3551F32410F04A00151738 /* SpectrumAnalyzerView.swift */,
-				9E515126241BDB6800DE5A02 /* AxisMode.swift */,
+				9E38EC0424338C2B00C7245C /* SpectrumAnalyzerGridView.swift */,
+				9E38EC09243495A800C7245C /* SpectrumAnalyzerGraphView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -223,6 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EFD9FEC2400265A00FEFFE3 /* Assets.xcassets in Resources */,
+				9E38EC0C24349C1000C7245C /* SpectrumAnalyzerView.xib in Resources */,
 				9EFD9FEF2400265A00FEFFE3 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -238,19 +245,20 @@
 				9E515129241D2B3800DE5A02 /* CGFloat+magnitudeOrder.swift in Sources */,
 				9EE77D76241294E900936BED /* SamplingFourierCalculator.swift in Sources */,
 				9EFD9FF82400267C00FEFFE3 /* fft.metal in Sources */,
-				9E515127241BDB6800DE5A02 /* AxisMode.swift in Sources */,
 				9E3551F42410F04A00151738 /* SpectrumAnalyzerView.swift in Sources */,
 				9EFD9FEA2400265700FEFFE3 /* ViewController.swift in Sources */,
 				9EE77D7A2412EEEC00936BED /* NSView+bindFrameToSuperviewBounds.swift in Sources */,
 				9E3552062410FB2E00151738 /* SpectrumAnalyzerDefaultInteractor.swift in Sources */,
 				9E3552042410FB1F00151738 /* SpectrumAnalyzerDefaultViewModel.swift in Sources */,
 				9EFD9FE82400265700FEFFE3 /* AppDelegate.swift in Sources */,
+				9E38EC0A243495A800C7245C /* SpectrumAnalyzerGraphView.swift in Sources */,
 				9E3551F12410E93100151738 /* SpectrumAnalyzerViewModel.swift in Sources */,
 				9E3551ED2410E8D100151738 /* SpectrumAnalyzerInteractor.swift in Sources */,
 				9E0161BF241799DB00577A02 /* Fifo.swift in Sources */,
 				9E35520F241103BB00151738 /* SamplingFourierCalculatorImplementation.swift in Sources */,
 				9E3551FC2410F2E100151738 /* SpectrumAnalyzerViewModelDelegate.swift in Sources */,
 				9E3906D4240EBEB2000ABCDB /* Int+binaryInversed.swift in Sources */,
+				9E38EC0524338C2B00C7245C /* SpectrumAnalyzerGridView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
