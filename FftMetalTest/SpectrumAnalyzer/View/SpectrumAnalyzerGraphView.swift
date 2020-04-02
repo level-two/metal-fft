@@ -113,7 +113,7 @@ fileprivate extension SpectrumAnalyzerGraphView {
             else { return [] }
 
         func y(for val: CGFloat) -> CGFloat {
-            return bounds.height * val / (maxSampleVal - minSampleVal)
+            return bounds.height * (val - minSampleVal) / (maxSampleVal - minSampleVal)
         }
 
         var prevX = CGFloat(-1)

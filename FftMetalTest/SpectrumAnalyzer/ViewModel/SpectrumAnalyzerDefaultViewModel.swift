@@ -26,7 +26,7 @@ class SpectrumAnalyzerDefaultViewModel: SpectrumAnalyzerViewModel {
         sampleRate = 44100
 
         freqRange = (min: sampleRate/(2*samplesNumber), max: sampleRate/2)
-        sampleValuesRange = (min:-150, max: 10)
+        sampleValuesRange = (min: -150, max: 10)
 
         samples = []
 

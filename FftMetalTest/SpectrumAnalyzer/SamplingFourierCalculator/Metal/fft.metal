@@ -67,11 +67,27 @@ kernel void fftStep(constant ParamBuff &parameters [[buffer(0)]],
     resultBuffer[i] = sample;
 }
 
-kernel void modLg(device const float2* inputBuffer [[buffer(0)]],
-                    device float* resultBuffer [[buffer(1)]],
-                    uint i [[thread_position_in_grid]]) {
+kernel void applyWindow(device const float* inputSignalBuffer [[buffer(0)]],
+                        device const float* windowBuffer [[buffer(1)]],
+                        device float2* complexResultBuffer [[buffer(2)]],
+                        uint i [[thread_position_in_grid]]) {
+    auto windowedSample = inputSignalBuffer[i] * windowBuffer[i];
+    complexResultBuffer[i] = float2(windowedSample, 0);
+}
+
+
+struct DbFsParamBuff {
+    float windowSum [[id(0)]];
+    float fullScaleValue [[id(1)]];
+};
+
+
+kernel void dbFs(constant DbFsParamBuff &parameters [[buffer(0)]],
+                 device const float2* inputBuffer [[buffer(1)]],
+                 device float* resultBuffer [[buffer(2)]],
+                 uint i [[thread_position_in_grid]]) {
 
     auto modulus = complexModulus(inputBuffer[i]);
-    resultBuffer[i] = log10(modulus);
+    resultBuffer[i] = 20 * log10(2 * modulus / (parameters.windowSum * parameters.fullScaleValue));
 }
 
